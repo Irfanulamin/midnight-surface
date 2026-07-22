@@ -18,24 +18,16 @@ export function SectionLabel({
   );
 }
 
-export function SectionHeading({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  /*
-   * Measured off the Frame 1 export rather than eyeballed: the two lines of
-   * "Businesses That Trust Our Work" have 48px cap heights (=> ~66px at Inter's
-   * 0.727 cap ratio) and their tops sit 74px apart (=> line-height 1.12).
-   * The previous 3.5rem cap was clamping this ~10px too small at 1440.
-   */
-  return (
-    <h2
-      className={`text-[clamp(2.25rem,4.6vw,4.125rem)] font-bold leading-[1.12] tracking-[-0.025em] ${className}`}
-    >
-      {children}
-    </h2>
-  );
-}
+/*
+ * Section h2 type ramp, measured off the Frame 1 export rather than eyeballed:
+ * the two lines of "Businesses That Trust Our Work" have 48px cap heights
+ * (=> ~66px at Inter's 0.727 cap ratio) and their tops sit 74px apart
+ * (=> line-height 1.12). The previous 3.5rem cap was clamping this ~10px too
+ * small at 1440.
+ *
+ * Exported as a class string rather than a component because <SectionIntro>
+ * renders the h2 through <TextReveal>, which needs to own the element to split
+ * it into per-word masks.
+ */
+export const sectionHeadingClass =
+  "text-[clamp(2.25rem,4.6vw,4.125rem)] font-bold leading-[1.12] tracking-[-0.025em]";

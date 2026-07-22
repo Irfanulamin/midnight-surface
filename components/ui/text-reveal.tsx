@@ -1,0 +1,148 @@
+"use client";
+
+import { motion, useReducedMotion } from "motion/react";
+
+/*
+ * Word-by-word mask reveal.
+ *
+ * Each word sits in its own overflow-hidden box and slides up from below its
+ * own baseline, so the line assembles itself left to right instead of fading
+ * in as a block. This is the single loudest piece of motion on the page, which
+ * is why it is reserved for headings.
+ *
+ * Two details that look like noise but are not:
+ *
+ *   - pb-[0.14em] / -mb-[0.14em] on the mask. overflow-hidden clips at the
+ *     content box, which cuts the descenders off g, y and p. The padding gives
+ *     them room and the equal negative margin takes the space back out of the
+ *     layout, so line spacing is unchanged.
+ *
+ *   - The space between words is a real text node BETWEEN the masks, not
+ *     inside them. Inside an inline-block a trailing space is dropped, and a
+ *     non-breaking space would stop the heading wrapping where the design
+ *     needs it to.
+ *
+ * Only transform moves, so this stays on the compositor.
+ */
+
+const EASE = [0.16, 1, 0.3, 1] as const;
+
+const tags = {
+  h1: motion.h1,
+  h2: motion.h2,
+  h3: motion.h3,
+  p: motion.p,
+  span: motion.span,
+} as const;
+
+export function TextReveal({
+  text,
+  as = "h2",
+  className,
+  delay = 0,
+  stagger = 0.055,
+  duration = 0.9,
+  /** Fraction of the heading that must be visible before it fires. */
+  amount = 0.4,
+}: {
+  /**
+   * Plain string only — it has to be split on spaces. Mixed markup (a coloured
+   * span, an explicit line break) belongs in <MaskReveal> instead.
+   */
+  text: string;
+  as?: keyof typeof tags;
+  className?: string;
+  delay?: number;
+  stagger?: number;
+  duration?: number;
+  amount?: number;
+}) {
+  const reduce = useReducedMotion();
+  const words = text.split(" ");
+
+  if (reduce) {
+    const Plain = as;
+    return <Plain className={className}>{text}</Plain>;
+  }
+
+  const Tag = tags[as];
+
+  return (
+    <Tag
+      className={className}
+      /*
+       * Splitting into per-word spans leaves the text readable to a screen
+       * reader, but the label guarantees it is announced as one phrase rather
+       * than as a pile of fragments. The spans are hidden to avoid the double
+       * read that would otherwise cause.
+       */
+      aria-label={text}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount }}
+      variants={{
+        hidden: {},
+        visible: {
+          transition: { staggerChildren: stagger, delayChildren: delay },
+        },
+      }}
+    >
+      {words.map((word, i) => (
+        <span key={i} aria-hidden>
+          <span className="inline-block overflow-hidden pb-[0.14em] mb-[-0.14em]">
+            <motion.span
+              className="inline-block"
+              variants={{
+                hidden: { y: "115%" },
+                visible: { y: "0%", transition: { duration, ease: EASE } },
+              }}
+            >
+              {word}
+            </motion.span>
+          </span>
+          {i < words.length - 1 ? " " : null}
+        </span>
+      ))}
+    </Tag>
+  );
+}
+
+/*
+ * Single-mask variant, for a line that is not a plain string — a coloured span,
+ * an explicit break. Stack several to reveal a multi-line heading line by line.
+ */
+export function MaskReveal({
+  children,
+  className,
+  delay = 0,
+  duration = 0.9,
+  amount = 0.5,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+  duration?: number;
+  amount?: number;
+}) {
+  const reduce = useReducedMotion();
+
+  if (reduce) {
+    return <span className={`block ${className ?? ""}`}>{children}</span>;
+  }
+
+  return (
+    <span
+      className={`block overflow-hidden pb-[0.14em] mb-[-0.14em] ${className ?? ""}`}
+    >
+      <motion.span
+        className="block"
+        initial={{ y: "115%" }}
+        whileInView={{ y: "0%" }}
+        viewport={{ once: true, amount }}
+        transition={{ duration, delay, ease: EASE }}
+      >
+        {children}
+      </motion.span>
+    </span>
+  );
+}

@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+
+import { ScrollProgress } from "@/components/ui/scroll-progress";
+import { SmoothScroll } from "@/components/ui/smooth-scroll";
 import "./globals.css";
 
 /*
@@ -43,7 +46,15 @@ export default function RootLayout({
       lang="en"
       className={`${interDisplay.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {/*
+          Mounted above the page so Lenis is running before any ScrollTrigger
+          in the tree below measures the document.
+        */}
+        <SmoothScroll />
+        <ScrollProgress />
+        {children}
+      </body>
     </html>
   );
 }

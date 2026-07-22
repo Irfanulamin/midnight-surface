@@ -138,26 +138,41 @@ export function AccordionItem({
   const triggerRef = useRef<HTMLHeadingElement>(null);
 
   /*
-   * The panel animates to a measured pixel height, never to "auto".
+   * The panel opens by animating grid-template-rows 0fr -> 1fr, not to a
+   * measured pixel height.
    *
-   * Motion can animate *to* height:auto, but animating *away from* a literal
-   * auto it snapped to via initial={false} fails silently — the row that
-   * started open would stay stuck at full height with its trigger already
-   * reporting closed. A number has no such edge case.
+   * It used to animate to a number read from the content on mount. That number
+   * is a second source of truth for something the layout already knows, and
+   * when it was wrong — measured before the content had its final width, or
+   * read off a node the observer had lost — the panel animated to a height
+   * shorter than its contents and silently clipped them, which is exactly what
+   * happened to the service rows once the tag list started wrapping.
    *
-   * ResizeObserver keeps the number honest when the content reflows (viewport
-   * changes, font swap), so the open height is never stale.
+   * 0fr -> 1fr has no such failure mode: the row resolves to whatever the
+   * content actually is, at every viewport, with no measurement involved. The
+   * inner min-h-0 is what lets the track collapse below the content's min-content
+   * height — without it the panel will not close.
+   *
+   * (Animating height:auto was never an option: Motion can animate *to* auto,
+   * but animating away from a literal auto snapped in via initial={false} fails
+   * silently, leaving an open panel stuck at full height.)
    */
   const contentRef = useRef<HTMLDivElement>(null);
-  const [contentHeight, setContentHeight] = useState(0);
 
+  /*
+   * The observer now only feeds the optional fixedHeight reserve. If it ever
+   * reports a stale number the reserve is a little off — it can no longer
+   * truncate the panel itself.
+   */
   useEffect(() => {
     const el = contentRef.current;
     if (!el) return;
     const measure = () => {
-      const h = el.offsetHeight;
-      setContentHeight(h);
-      reportMetrics(index, triggerRef.current?.offsetHeight ?? 0, h);
+      reportMetrics(
+        index,
+        triggerRef.current?.offsetHeight ?? 0,
+        el.offsetHeight,
+      );
     };
     measure();
     const observer = new ResizeObserver(measure);
@@ -186,37 +201,36 @@ export function AccordionItem({
       </h3>
 
       {/*
-       * Always mounted, height animated between 0 and auto.
+       * Always mounted, collapsed by the grid track rather than unmounted.
        *
        * This previously used AnimatePresence with a conditional child, and the
        * exit animation intermittently failed to run — leaving a closed panel
-       * stuck at height:auto/opacity:1 while its trigger reported
-       * aria-expanded="false". Keeping the node mounted removes the entire
-       * mount/unmount race; there is no exit to miss.
+       * stuck open while its trigger reported aria-expanded="false". Keeping the
+       * node mounted removes the entire mount/unmount race; there is no exit to
+       * miss.
+       *
+       * A plain CSS transition rather than Motion: grid-template-rows is not a
+       * value Motion interpolates, and the browser does it natively.
        *
        * `inert` (React 19) pulls the collapsed content out of the tab order and
        * the accessibility tree, which overflow-hidden alone does not do.
        */}
-      <motion.div
+      <div
         id={panelId}
         role="region"
         aria-labelledby={triggerId}
         data-open={open ? "true" : "false"}
         inert={!open}
-        initial={false}
-        animate={{ height: open ? contentHeight : 0, opacity: open ? 1 : 0 }}
-        transition={
+        className={`grid overflow-hidden ${
           reduce
-            ? { duration: 0 }
-            : {
-                height: { duration: 0.42, ease: EASE },
-                opacity: { duration: 0.28 },
-              }
-        }
-        className="overflow-hidden"
+            ? ""
+            : "transition-[grid-template-rows,opacity] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
+        } ${open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
       >
-        <div ref={contentRef}>{children}</div>
-      </motion.div>
+        <div ref={contentRef} className="min-h-0">
+          {children}
+        </div>
+      </div>
     </div>
   );
 }

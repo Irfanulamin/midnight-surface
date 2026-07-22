@@ -1,8 +1,8 @@
-﻿import Image from "next/image";
+import Image from "next/image";
 import { CaretDoubleRight, Sun } from "@phosphor-icons/react/ssr";
 
-import { SectionHeading, SectionLabel } from "@/components/section-label";
-import { Reveal } from "@/components/ui/reveal";
+import { SectionIntro } from "@/components/section-intro";
+import { RevealGroup, RevealItem } from "@/components/ui/reveal";
 
 /*
  * Bento layout, measured off Frame 1 (cards span y 4195-4950):
@@ -23,29 +23,41 @@ import { Reveal } from "@/components/ui/reveal";
  */
 export function WhyUs() {
   return (
-    <section className="px-6 py-28">
+    <section className="px-6 py-16 sm:py-20 md:py-28">
       <div className="mx-auto max-w-[1160px]">
-        <Reveal className="text-center">
-          <SectionLabel>Why Choose Us</SectionLabel>
-          <SectionHeading className="mx-auto mt-7 max-w-[740px] text-ink">
-            Built for Small Businesses That Want Results
-          </SectionHeading>
-          <p className="mx-auto mt-6 max-w-[780px] text-[18px] leading-8 text-ink-muted">
-            We simplify the entire website process by bringing design,
-            development, launch, and ongoing support together under one reliable
-            team
-          </p>
-        </Reveal>
+        <SectionIntro
+          label="Why Choose Us"
+          heading="Built for Small Businesses That Want Results"
+          headingClassName="mx-auto mt-7 max-w-[740px] text-ink"
+          body="We simplify the entire website process by bringing design, development, launch, and ongoing support together under one reliable team"
+          bodyClassName="mx-auto mt-6 max-w-[780px] text-ink-muted"
+        />
 
-        <Reveal
-          delay={0.1}
+        {/*
+          Cascades column by column, left to right.
+
+          The stagger is at column level, not card level: the columns are flex
+          containers whose children divide a fixed 760px between them, and
+          wrapping each card in its own animated element would put a div between
+          the column and the `flex-1` that does the dividing.
+        */}
+        <RevealGroup
+          stagger={0.12}
+          delayChildren={0.1}
           amount={0.15}
-          className="mt-16 grid gap-5 md:h-[760px] md:grid-cols-3"
+          /*
+            Below md the columns stack and `flex-1` has no fixed height to
+            divide, so each card collapses to its content. The cards whose
+            illustration is absolutely positioned would collapse to just their
+            heading and the artwork would spill out, which is why those carry an
+            explicit min-height that is dropped again at md.
+          */
+          className="mt-10 grid gap-4 sm:mt-14 sm:gap-5 md:mt-16 md:h-[760px] md:grid-cols-3"
         >
           {/* â”€â”€ Column 1 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-          <div className="flex flex-col gap-5">
+          <RevealItem className="flex flex-col gap-4 sm:gap-5">
             {/* 4x export of node 132:8124 (366x370). */}
-            <article className="relative flex flex-1 flex-col justify-end overflow-hidden rounded-2xl bg-teal">
+            <article className="relative flex min-h-[300px] flex-1 flex-col justify-end overflow-hidden rounded-2xl bg-teal md:min-h-0">
               <Image
                 src="/design/bento-star.png"
                 alt=""
@@ -53,26 +65,26 @@ export function WhyUs() {
                 height={1480}
                 className="pointer-events-none absolute inset-0 h-full w-full object-cover"
               />
-              <div className="relative m-4 rounded-xl bg-cream px-6 py-5">
-                <h3 className="text-[21px] font-semibold leading-snug text-teal-deep">
+              <div className="relative m-4 rounded-xl bg-cream px-5 py-4 sm:px-6 sm:py-5">
+                <h3 className="text-[19px] font-semibold leading-snug text-teal-deep sm:text-[21px]">
                   We Made Custom Design{" "}
                   <span className="bg-yellow px-1">Not Templates</span>
                 </h3>
               </div>
             </article>
 
-            <article className="flex flex-1 items-end rounded-2xl bg-cream p-7">
-              <h3 className="text-[21px] font-semibold text-teal-deep">
+            <article className="flex min-h-[120px] flex-1 items-end rounded-2xl bg-cream p-6 sm:p-7 md:min-h-0">
+              <h3 className="text-[19px] font-semibold text-teal-deep sm:text-[21px]">
                 One Stop Solution
               </h3>
             </article>
-          </div>
+          </RevealItem>
 
           {/* â”€â”€ Column 2 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-          <div className="flex flex-col gap-5">
+          <RevealItem className="flex flex-col gap-4 sm:gap-5">
             {/* 4x export of node 135:8153 (364x242). */}
-            <article className="relative flex-1 overflow-hidden rounded-2xl bg-cream">
-              <h3 className="relative z-10 flex items-start gap-2 p-7 text-[21px] font-semibold leading-snug text-teal-deep">
+            <article className="relative min-h-[260px] flex-1 overflow-hidden rounded-2xl bg-cream md:min-h-0">
+              <h3 className="relative z-10 flex items-start gap-2 p-6 text-[19px] font-semibold leading-snug text-teal-deep sm:p-7 sm:text-[21px]">
                 <Sun
                   size={28}
                   weight="fill"
@@ -94,14 +106,14 @@ export function WhyUs() {
               />
             </article>
 
-            <article className="flex flex-1 rounded-2xl bg-cream p-7">
-              <h3 className="max-w-[220px] text-[21px] font-semibold leading-snug text-teal-deep">
+            <article className="flex min-h-[120px] flex-1 rounded-2xl bg-cream p-6 sm:p-7 md:min-h-0">
+              <h3 className="max-w-[220px] text-[19px] font-semibold leading-snug text-teal-deep sm:text-[21px]">
                 Responsive For All Devices
               </h3>
             </article>
 
-            <article className="relative flex-1 overflow-hidden rounded-2xl bg-cream">
-              <h3 className="relative z-10 p-7 text-[21px] font-semibold leading-snug text-teal-deep">
+            <article className="relative min-h-[280px] flex-1 overflow-hidden rounded-2xl bg-cream md:min-h-0">
+              <h3 className="relative z-10 p-6 text-[19px] font-semibold leading-snug text-teal-deep sm:p-7 sm:text-[21px]">
                 Support After{" "}
                 <span className="bg-coral px-1 text-white">Finish</span>
               </h3>
@@ -121,12 +133,12 @@ export function WhyUs() {
                 className="pointer-events-none absolute -bottom-1 left-1/2 w-[72%] -translate-x-1/2"
               />
             </article>
-          </div>
+          </RevealItem>
 
           {/* â”€â”€ Column 3 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-          <div className="flex flex-col gap-5">
-            <article className="flex flex-1 flex-col overflow-hidden rounded-2xl bg-cream p-5">
-              <h3 className="flex items-center gap-2 px-2 pt-2 text-[21px] font-semibold text-teal-deep">
+          <RevealItem className="flex flex-col gap-4 sm:gap-5">
+            <article className="flex min-h-[340px] flex-1 flex-col overflow-hidden rounded-2xl bg-cream p-5 md:min-h-0">
+              <h3 className="flex items-center gap-2 px-2 pt-2 text-[19px] font-semibold text-teal-deep sm:text-[21px]">
                 <CaretDoubleRight
                   size={22}
                   weight="fill"
@@ -147,21 +159,21 @@ export function WhyUs() {
                 height={707}
                 className="my-auto w-[62%] self-center"
               />
-              <div className="rounded-xl bg-teal-deep px-6 py-5">
-                <p className="text-[21px] font-semibold leading-snug text-white">
+              <div className="rounded-xl bg-teal-deep px-5 py-4 sm:px-6 sm:py-5">
+                <p className="text-[19px] font-semibold leading-snug text-white sm:text-[21px]">
                   Launch In A <span className="text-yellow">Week</span> Not
                   Months
                 </p>
               </div>
             </article>
 
-            <article className="flex flex-1 items-end rounded-2xl bg-cream p-7">
-              <h3 className="text-[21px] font-semibold text-teal-deep">
+            <article className="flex min-h-[120px] flex-1 items-end rounded-2xl bg-cream p-6 sm:p-7 md:min-h-0">
+              <h3 className="text-[19px] font-semibold text-teal-deep sm:text-[21px]">
                 Start With 0.00$
               </h3>
             </article>
-          </div>
-        </Reveal>
+          </RevealItem>
+        </RevealGroup>
       </div>
     </section>
   );

@@ -3,22 +3,25 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useReducedMotion } from "motion/react";
 
 gsap.registerPlugin(ScrollTrigger);
 
 /*
  * Scroll-driven horizontal pan.
  *
- * The section pins at the top of the viewport, the inner track scrubs sideways
- * as the user scrolls, and once the track runs out the page releases and
- * continues to the next section.
+ * On desktop the section pins at the top of the viewport, the inner track
+ * scrubs sideways as the user scrolls, and once the track runs out the page
+ * releases and continues to the next section.
  *
  * This is the one place GSAP earns its place over Motion: it needs real pinning
  * and scrubbing, which ScrollTrigger does natively and `whileInView` cannot.
  * Entry reveals elsewhere stay on Motion.
  *
- * Two details that break this if you get them wrong:
+ * Below md the pan is dropped entirely and the track becomes a plain vertical
+ * stack. A pinned section that eats several screens of scroll is hostile on a
+ * phone, and the cards are wider than the viewport anyway.
+ *
+ * Two details that break the desktop path if you get them wrong:
  *   - `start: "top top"` — anything else (e.g. "top center") begins the pan
  *     before the section is pinned, so the user sees the track already
  *     part-way across.
@@ -39,61 +42,85 @@ export function HorizontalPan({
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion();
 
   useEffect(() => {
     const wrap = wrapRef.current;
     const track = trackRef.current;
-    if (!wrap || !track || reduce) return;
-
-    const ctx = gsap.context(() => {
-      const getDistance = () =>
-        Math.max(0, track.scrollWidth - window.innerWidth + 48);
-
-      const timeline = gsap.timeline({
-        scrollTrigger: {
-          trigger: wrap,
-          start: "top top",
-          end: () => `+=${getDistance()}`,
-          pin: true,
-          scrub: 1,
-          // Recalculates on resize; without it the distance is stale after a
-          // viewport change and the pan over- or under-shoots.
-          invalidateOnRefresh: true,
-        },
-      });
-
-      timeline.to(track, { x: () => -getDistance(), ease: "none" }, 0);
-    }, wrap);
+    if (!wrap || !track) return;
 
     /*
-     * Images settle after first paint and change scrollWidth. Without a refresh
-     * the pan distance is measured too short and the last cards never arrive.
+     * gsap.matchMedia rather than a one-shot matchMedia read: it re-runs the
+     * setup when the query flips and reverts everything the callback created on
+     * the way out, so rotating a tablet past the breakpoint cannot leave a
+     * stale pin spacer behind.
+     *
+     * The reduced-motion clause is part of the query for the same reason — the
+     * OS setting can change while the page is open.
      */
-    const onLoad = () => ScrollTrigger.refresh();
-    window.addEventListener("load", onLoad);
-    const timer = window.setTimeout(onLoad, 600);
+    const mm = gsap.matchMedia();
 
-    return () => {
-      window.removeEventListener("load", onLoad);
-      window.clearTimeout(timer);
-      ctx.revert();
-    };
-  }, [reduce]);
+    mm.add(
+      "(min-width: 768px) and (prefers-reduced-motion: no-preference)",
+      () => {
+        const getDistance = () =>
+          Math.max(0, track.scrollWidth - window.innerWidth + 48);
+
+        const timeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: wrap,
+            start: "top top",
+            end: () => `+=${getDistance()}`,
+            pin: true,
+            scrub: 1,
+            // Recalculates on resize; without it the distance is stale after a
+            // viewport change and the pan over- or under-shoots.
+            invalidateOnRefresh: true,
+          },
+        });
+
+        timeline.to(track, { x: () => -getDistance(), ease: "none" }, 0);
+
+        /*
+         * Images settle after first paint and change scrollWidth. Without a
+         * refresh the pan distance is measured too short and the last cards
+         * never arrive.
+         */
+        const onLoad = () => ScrollTrigger.refresh();
+        window.addEventListener("load", onLoad);
+        const timer = window.setTimeout(onLoad, 600);
+
+        return () => {
+          window.removeEventListener("load", onLoad);
+          window.clearTimeout(timer);
+        };
+      },
+    );
+
+    return () => mm.revert();
+  }, []);
 
   return (
     <div ref={wrapRef} className={`relative overflow-hidden ${className ?? ""}`}>
-      <div className="flex min-h-[100dvh] flex-col justify-center py-20">
+      {/*
+        Exactly one viewport tall while pinned, not min-height: the section is
+        fixed in place, so anything that does not fit is simply never reachable.
+        The header takes its natural height and the track absorbs whatever is
+        left (flex-1 + min-h-0), which lets a card size its image to the space
+        actually available instead of overflowing its own caption off screen.
+      */}
+      <div className="flex flex-col py-16 md:h-[100dvh] md:py-14">
         {header}
         {/*
-          The track starts one full viewport to the right, so every card begins
-          off-screen and arrives one at a time as the section is scrubbed. That
-          sequencing is what lets each card's curtain fire on its own — if they
-          all started on screen their reveals would trigger together.
+          On desktop the track starts one full viewport to the right, so every
+          card begins off-screen and arrives one at a time as the section is
+          scrubbed. That sequencing is what lets each card's curtain fire on its
+          own — if they all started on screen their reveals would trigger
+          together. Stacked on mobile there is nothing to sequence, so the
+          offsets, w-max and height sharing are all md-only.
         */}
         <div
           ref={trackRef}
-          className={`mt-14 flex w-max pl-[88vw] pr-[12vw] ${gapClassName}`}
+          className={`mt-10 flex flex-col px-6 md:mt-10 md:w-max md:min-h-0 md:flex-1 md:flex-row md:px-0 md:pl-[88vw] md:pr-[12vw] ${gapClassName}`}
         >
           {children}
         </div>

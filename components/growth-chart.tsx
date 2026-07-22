@@ -10,6 +10,8 @@ import {
   useReducedMotion,
 } from "motion/react";
 
+import { useMediaQuery } from "@/components/ui/use-media-query";
+
 /*
  * Hero growth chart.
  *
@@ -101,7 +103,28 @@ const mixHex = (from: string, to: string, t: number) => {
   return `#${c(r1, r2)}${c(g1, g2)}${c(b1, b2)}`;
 };
 
+/*
+ * Type scale for narrow viewports.
+ *
+ * The whole drawing is one 932-unit viewBox, so it scales uniformly with the
+ * card — which means on a phone the 15-19 unit labels land under 7 device px.
+ * Rather than letting the card scroll (a chart you have to drag sideways is not
+ * a chart), the geometry stays fixed and only the type grows, in user units, so
+ * it survives the downscale.
+ *
+ * 1.7 is the largest factor that still fits: at this size "TIME WITH US" spans
+ * x 317-615 and the callout pill x 290-701, both inside the 932 box.
+ */
+const COMPACT_TYPE_SCALE = 1.7;
+
 export function GrowthChart() {
+  /*
+   * Matches Tailwind's sm breakpoint. Below it the card is narrow enough that
+   * the labels need the boost; at sm and up the measured Figma sizes stand.
+   */
+  const compact = useMediaQuery("(max-width: 639px)");
+  const s = compact ? COMPACT_TYPE_SCALE : 1;
+
   const rootRef = useRef<SVGSVGElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
   const markerRef = useRef<SVGGElement>(null);
@@ -360,8 +383,8 @@ export function GrowthChart() {
           x="466"
           y="558"
           textAnchor="middle"
-          fontSize="19"
-          letterSpacing="3.4"
+          fontSize={19 * s}
+          letterSpacing={3.4 * s}
           fillOpacity="0.45"
         >
           TIME WITH US
@@ -370,8 +393,8 @@ export function GrowthChart() {
           x="-302"
           y="850"
           textAnchor="middle"
-          fontSize="19"
-          letterSpacing="3.4"
+          fontSize={19 * s}
+          letterSpacing={3.4 * s}
           fillOpacity="0.45"
           transform="rotate(-90)"
         >
@@ -404,10 +427,10 @@ export function GrowthChart() {
               style={{ transformOrigin: `${m.x}px ${m.y}px` }}
             />
             <motion.text
-              x={m.x - 18}
-              y={m.y - 16}
+              x={m.x - 18 * s}
+              y={m.y - 16 * s}
               textAnchor="end"
-              fontSize="16"
+              fontSize={16 * s}
               fill={INK}
               fillOpacity="0.55"
               initial={reduce ? false : { opacity: 0, x: 8 }}
@@ -437,10 +460,10 @@ export function GrowthChart() {
       />
       <motion.text
         x={X0}
-        y="488"
+        y={488 + 8 * (s - 1)}
         textAnchor="middle"
-        fontSize="15"
-        letterSpacing="2.6"
+        fontSize={15 * s}
+        letterSpacing={2.6 * s}
         fill={INK}
         fillOpacity="0.4"
         initial={reduce ? false : { opacity: 0, y: 6 }}
@@ -500,20 +523,25 @@ export function GrowthChart() {
             delay: 0.14,
           }}
         >
+          {/*
+            The pill is sized from the same scale as its label, so the box and
+            the type grow together — scaling only the font would spill the text
+            straight out of the capsule.
+          */}
           <rect
-            x="-264"
-            y="-74"
-            width="242"
-            height="46"
-            rx="23"
+            x={-264 * s}
+            y={-74 * s}
+            width={242 * s}
+            height={46 * s}
+            rx={23 * s}
             fill={INK}
             fillOpacity="0.93"
           />
           <text
-            x="-143"
-            y="-44"
+            x={-143 * s}
+            y={-44 * s}
             textAnchor="middle"
-            fontSize="17"
+            fontSize={17 * s}
             fill="#ffffff"
           >
             Your business, grown

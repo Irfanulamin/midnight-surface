@@ -1,8 +1,7 @@
-﻿import Image from "next/image";
+import Image from "next/image";
 
-import { SectionHeading } from "@/components/section-label";
+import { SectionIntro } from "@/components/section-intro";
 import { Marquee } from "@/components/ui/marquee";
-import { Reveal } from "@/components/ui/reveal";
 
 /* Client marks, exported from Figma. */
 const clients = [
@@ -16,23 +15,26 @@ const clients = [
 
 export function TrustedBy() {
   return (
-    <section className="px-6 py-24">
-      <Reveal className="mx-auto max-w-[1160px] text-center">
-        <SectionHeading className="mx-auto max-w-[640px] text-ink">
-          Businesses That Trust Our Work
-        </SectionHeading>
-        <p className="mx-auto mt-6 max-w-[790px] text-[18px] leading-8 text-ink-muted">
-          We&apos;re proud to partner with businesses across different
-          industries, helping them build a strong online presence with websites
-          that deliver real results
-        </p>
-      </Reveal>
+    <section className="px-6 py-14 sm:py-20 md:py-24">
+      <SectionIntro
+        className="mx-auto max-w-[1160px]"
+        heading="Businesses That Trust Our Work"
+        headingClassName="mx-auto max-w-[640px] text-ink"
+        body={
+          <>
+            We&apos;re proud to partner with businesses across different
+            industries, helping them build a strong online presence with
+            websites that deliver real results
+          </>
+        }
+        bodyClassName="mx-auto mt-6 max-w-[790px] text-ink-muted"
+      />
 
-      <Marquee duration={45} className="mt-16">
+      <Marquee duration={45} className="mt-10 sm:mt-16">
         {clients.map((client) => (
           <div
             key={client.src}
-            className="lift grid h-[248px] w-[250px] shrink-0 place-items-center rounded-2xl bg-cream p-12"
+            className="lift grid h-[168px] w-[170px] shrink-0 place-items-center rounded-2xl bg-cream p-8 sm:h-[248px] sm:w-[250px] sm:p-12"
           >
             <Image
               src={client.src}
