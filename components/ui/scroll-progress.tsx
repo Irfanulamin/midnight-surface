@@ -1,6 +1,12 @@
 "use client";
 
-import { motion, useReducedMotion, useScroll, useSpring } from "motion/react";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "motion/react";
 
 /*
  * Reading-progress rule pinned to the top of the viewport.
@@ -24,10 +30,26 @@ export function ScrollProgress() {
     mass: 0.3,
   });
 
+  const progress = reduce ? scrollYProgress : smoothed;
+
+  /*
+   * Fades out over the last stretch of the page.
+   *
+   * Once the footer is on screen there is no reading left to measure, and a
+   * full-width bar sitting over it is just chrome on top of the closing frame.
+   * The footer is a screen tall, so the last few percent of the scroll is
+   * exactly that closing frame.
+   *
+   * Derived from the same motion value rather than held in state: this runs on
+   * the compositor and costs no renders, where a scroll listener flipping a
+   * boolean would re-render the tree near the bottom of every page view.
+   */
+  const opacity = useTransform(progress, [0.94, 0.99], [1, 0]);
+
   return (
     <motion.div
       aria-hidden
-      style={{ scaleX: reduce ? scrollYProgress : smoothed }}
+      style={{ scaleX: progress, opacity }}
       className="fixed inset-x-0 top-0 z-[60] h-[3px] origin-left bg-yellow-strong"
     />
   );

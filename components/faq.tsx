@@ -5,22 +5,36 @@ import { Accordion, AccordionItem } from "@/components/ui/accordion";
 import { Reveal } from "@/components/ui/reveal";
 
 /*
- * The Figma writes the same placeholder question five times and only gives the
- * second row an answer. Kept verbatim rather than inventing five FAQs — swap in
- * the real copy when it exists.
+ * Real answers, written to the studio's actual policies: the free draft, $0
+ * upfront, no commitment, 5-7 day delivery, the two published prices, and the
+ * WordPress / React / AI scope. The Figma drew five identical placeholder rows;
+ * these replace them.
  */
-const QUESTION =
-  "Lorem Ipsum is simply dummy text of the printing and typesetting industry.";
-
-const PLACEHOLDER_ANSWER =
-  "Every business is different. If your project requires custom features, advanced integrations, or a unique workflow, we'll create a tailored solution designed specifically for your goals.";
-
 const faqs = [
-  { q: QUESTION, a: PLACEHOLDER_ANSWER },
-  { q: QUESTION, a: PLACEHOLDER_ANSWER },
-  { q: QUESTION, a: PLACEHOLDER_ANSWER },
-  { q: QUESTION, a: PLACEHOLDER_ANSWER },
-  { q: QUESTION, a: PLACEHOLDER_ANSWER },
+  {
+    q: "How does the free draft design work?",
+    a: "We design your homepage first and show it to you before you pay anything. If it is not right, you walk away owing nothing. Most clients see their first concept within a few days of the initial call.",
+  },
+  {
+    q: "What does $0 upfront actually mean?",
+    a: "You do not pay to get started. We only ask for payment once you have seen the design and decided to go ahead, so there is no risk in finding out what we would build for you.",
+  },
+  {
+    q: "How long until my site is live?",
+    a: "A landing page is usually live in five to seven days once we have your content and your go-ahead. Larger multi-page sites take a little longer, and we give you a firm date before we start.",
+  },
+  {
+    q: "What is included in the price?",
+    a: "Design, responsive development, a contact form, basic SEO setup, speed optimisation and two rounds of revisions. The Landing Page is $399 one time and the Complete Website is $699 one time, with no monthly fees.",
+  },
+  {
+    q: "Do you build in WordPress or with code?",
+    a: "Both. We use WordPress when you want to edit pages yourself, and React or Next.js when you need something faster or more custom. We recommend whichever fits how you plan to run the site.",
+  },
+  {
+    q: "Can you add AI features or custom tools?",
+    a: "Yes. We integrate AI for things like support replies and content drafting, and we build custom tools such as dashboards and booking systems on top of your own database when an off-the-shelf option will not do.",
+  },
 ];
 
 export function Faq() {
@@ -55,7 +69,6 @@ export function Faq() {
               key={index}
               delay={Math.min(index, 3) * 0.06}
               duration={0.6}
-              amount={0.4}
             >
               <AccordionItem
                 index={index}

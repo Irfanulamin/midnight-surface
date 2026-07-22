@@ -1,8 +1,49 @@
 import Image from "next/image";
 
 import { SectionIntro } from "@/components/section-intro";
-import { Parallax } from "@/components/ui/parallax";
-import { RevealGroup, RevealItem } from "@/components/ui/reveal";
+import {
+  TestimonialCarousel,
+  type Testimonial,
+} from "@/components/testimonial-carousel";
+import { Reveal } from "@/components/ui/reveal";
+
+/*
+ * Realistic placeholder quotes: one concrete outcome each, short enough to read
+ * in a glance. Names and companies are fictional; swap in real ones when you
+ * have them.
+ */
+const testimonials: Testimonial[] = [
+  {
+    name: "Kazi Mirajul Islam",
+    role: "Founder, Loomcraft Studio",
+    rating: "10/10",
+    quote:
+      "They showed me a homepage before I paid a cent, and it already beat the site I had been putting off for two years. We were live the week after.",
+    image: "/design/testimonial-kazi.png",
+    width: 287,
+    height: 405,
+  },
+  {
+    name: "Alexis John",
+    role: "Founder, Northbend Coffee",
+    rating: "9.5/10",
+    quote:
+      "We had the new site and a working booking form live in nine days. Enquiries have not dropped off since.",
+    image: "/design/testimonial-alexis-john.png",
+    width: 463,
+    height: 632,
+  },
+  {
+    name: "Max Francisco",
+    role: "Director, Halden Strength",
+    rating: "10/10",
+    quote:
+      "They rebuilt the pages around how members actually use them. Sign-ups climbed without us changing anything else.",
+    image: "/design/testimonial-max-francisco.png",
+    width: 736,
+    height: 946,
+  },
+];
 
 export function Testimonials() {
   return (
@@ -10,7 +51,99 @@ export function Testimonials() {
       id="success-stories"
       className="relative scroll-mt-24 overflow-hidden bg-cream px-6 py-16 sm:py-20 md:py-28"
     >
-      <div className="relative mx-auto max-w-[1160px]">
+      {/*
+        `isolate` makes this a stacking context so the quote mark's -z-10 stops
+        here, behind the heading and the card but still in front of the
+        section's cream. Without it the mark would drop behind the section
+        background and disappear entirely.
+      */}
+      <div className="relative isolate mx-auto max-w-[1160px]">
+        {/*
+          The oversized quote mark behind the section (Figma node 86:10657 —
+          two copies of the same comma, which is all the export contains).
+
+          Measured against the CONTENT column, not the section. The design's
+          content is 1128 wide inside a 1440 frame, and every figure below is a
+          ratio of that 1128, so the mark caps with the column at 1160 instead
+          of growing with the viewport — sized off the section it reached
+          ~1470px on a 1920 display, half again the size it is drawn.
+
+            group w 1101.5 / 1128            -> 97.6% of the column
+            each  w 514.2  / 1101.5          -> 46.7% of the group
+            gap     73.2   / 1101.5          ->  6.6% of the group
+            bleed past the column's right edge, and the rise above its top,
+            are translates of the mark's OWN size rather than offsets in px or
+            in column-%, so the whole composition scales as one piece and holds
+            at every width.
+
+          The section is already `overflow-hidden`, which crops the bleed the
+          way the mask does in Figma. The artwork is white at ~43% alpha in the
+          file itself, so it needs no opacity here — over cream it resolves to
+          the lighter cream in the design. It sits before the content in DOM
+          order, so the content paints over it without needing a z-index.
+
+          Tailwind compiles translate-* to the standalone `translate` property
+          while Motion writes `transform`, so the resting offset here and the
+          entry travel below compose instead of overwriting each other.
+        */}
+        {/*
+          alt="" keeps both images out of the accessibility tree.
+
+          -z-10 is load-bearing, not decoration. An absolutely positioned
+          element paints ABOVE non-positioned block content in the same
+          stacking context whatever the DOM order, so being written before the
+          heading was not enough — the mark was laying its cream over the words
+          and lifting their colour. Dropping it a layer puts it where it
+          belongs, behind the text rather than tinting it.
+        */}
+        <div className="pointer-events-none absolute top-0 right-0 -z-10 flex w-[97.6%] translate-x-[35.4%] -translate-y-[25%] gap-[6.6%]">
+          {/*
+            Slow and late: the mark drifts in from the right well after the
+            heading has assembled, over 1.6s, so it reads as the section
+            settling rather than a graphic snapping in. The outer comma trails
+            the inner by ~0.2s, so the pair opens outward toward the edge it
+            bleeds off instead of arriving as one slab. 90px of travel — a wide
+            shape covers ground fast, so the distance stays modest and the
+            duration does the smoothing. Each is its own <Reveal>, so the two
+            delays are absolute and independent.
+
+            amount 0.1: the mark is mostly outside the section's overflow, so
+            the observer only ever sees the sliver that is not clipped.
+          */}
+          <Reveal
+            direction="right"
+            distance={90}
+            duration={1.6}
+            delay={0.55}
+            amount={0.1}
+            className="w-[46.7%]"
+          >
+            <Image
+              src="/design/comma.png"
+              alt=""
+              width={2057}
+              height={2872}
+              className="w-full"
+            />
+          </Reveal>
+          <Reveal
+            direction="right"
+            distance={90}
+            duration={1.6}
+            delay={0.75}
+            amount={0.1}
+            className="w-[46.7%]"
+          >
+            <Image
+              src="/design/comma.png"
+              alt=""
+              width={2057}
+              height={2872}
+              className="w-full"
+            />
+          </Reveal>
+        </div>
+
         <SectionIntro
           label="Success Stories"
           heading="Real Results for Real Businesses"
@@ -25,67 +158,8 @@ export function Testimonials() {
           bodyClassName="mx-auto mt-6 max-w-[790px] text-ink-muted"
         />
 
-        {/* Portrait comes in from the left, quote from the right — they meet. */}
-        {/*
-          Flush against each other in the design. Stacked on mobile that reads
-          as one broken card, so the two only close up once they sit side by
-          side at md.
-        */}
-        <RevealGroup
-          stagger={0.14}
-          className="mt-10 flex flex-col gap-4 sm:mt-16 md:flex-row md:gap-0"
-        >
-          <RevealItem direction="left" className="shrink-0">
-            {/*
-              The portrait drifts against the scroll while the quote card stays
-              put, which separates the two planes — the section reads as a
-              person standing in front of the quote rather than beside it.
-              Small distance: the row is only 405px tall and anything larger
-              pulls the portrait off the card's top edge.
-            */}
-            <Parallax distance={26}>
-              <Image
-                src="/design/testimonial-kazi.png"
-                alt="Kazi Mirajul Islam"
-                width={287}
-                height={405}
-                className="h-[320px] w-full rounded-2xl object-cover object-top sm:h-[380px] md:h-[405px] md:w-[287px] md:object-center"
-              />
-            </Parallax>
-          </RevealItem>
+        <TestimonialCarousel items={testimonials} />
 
-          <RevealItem
-            direction="right"
-            className="flex flex-1 flex-col justify-between rounded-2xl bg-white p-6 sm:p-8 md:p-11"
-          >
-            <div>
-              <p className="max-w-[740px] text-[19px] leading-[1.4] tracking-[-0.01em] text-ink sm:text-[22px] md:text-[26px] md:leading-[1.35]">
-                Lorem Ipsum is simply dummy text of the printing and typesetting
-                industry.
-              </p>
-              <p className="mt-6 text-[15px] text-ink-muted">
-                Recommendation: <span className="text-coral">10/10</span>
-              </p>
-            </div>
-
-            <div className="mt-8 flex items-end justify-between gap-6 sm:mt-10">
-              <div>
-                <p className="text-[18px] font-semibold text-ink">
-                  Kazi Mirajul Islam
-                </p>
-                <p className="mt-1 text-[15px] text-ink-muted">
-                  CEO, XYZ Studio
-                </p>
-              </div>
-              <div className="flex items-center gap-3 text-[14px]">
-                <span className="text-ink">01</span>
-                <span className="h-px w-10 bg-ink" />
-                <span className="h-px w-10 bg-ink/20" />
-                <span className="text-ink/40">03</span>
-              </div>
-            </div>
-          </RevealItem>
-        </RevealGroup>
       </div>
     </section>
   );

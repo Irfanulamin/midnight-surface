@@ -1,4 +1,5 @@
 import { SectionLabel, sectionHeadingClass } from "@/components/section-label";
+import { DURATION } from "@/components/ui/motion";
 import { Reveal } from "@/components/ui/reveal";
 import { TextReveal } from "@/components/ui/text-reveal";
 
@@ -36,12 +37,14 @@ export function SectionIntro({
 }) {
   return (
     <div className={`${align === "center" ? "text-center" : ""} ${className}`}>
+      {/*
+        Label, heading and body all fire at the same viewport threshold (the
+        primitives' shared default), so the three beats are sequenced purely by
+        DOM order and the body's delay — one predictable gesture in every
+        section, rather than three elements each crossing their own line.
+      */}
       {label ? (
-        <Reveal
-          direction={align === "center" ? "up" : "left"}
-          duration={0.6}
-          amount={0.5}
-        >
+        <Reveal direction={align === "center" ? "up" : "left"} duration={DURATION.content}>
           <SectionLabel tone={tone}>{label}</SectionLabel>
         </Reveal>
       ) : null}
@@ -50,7 +53,6 @@ export function SectionIntro({
         as="h2"
         text={heading}
         className={`${sectionHeadingClass} ${headingClassName}`}
-        amount={0.35}
       />
 
       {/*
@@ -58,7 +60,7 @@ export function SectionIntro({
         finish leaves a visible dead beat on the longer headings.
       */}
       {body ? (
-        <Reveal delay={0.26} duration={0.8} amount={0.3}>
+        <Reveal delay={0.26} duration={DURATION.display}>
           {/*
             The type ramp lives here, not in the caller: it is identical in
             every section and the small-screen step down needs to happen in one

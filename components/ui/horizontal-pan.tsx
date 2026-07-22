@@ -31,6 +31,7 @@ gsap.registerPlugin(ScrollTrigger);
  */
 export function HorizontalPan({
   header,
+  footer,
   children,
   className,
   gapClassName = "gap-10",
@@ -40,12 +41,27 @@ export function HorizontalPan({
    * the last card near the right edge, so it never crosses the centre.
    */
   trailClassName = "md:pr-[12vw]",
+  centered = false,
 }: {
   header?: React.ReactNode;
+  /** Rendered below the track, inside the pinned viewport — it does not pan. */
+  footer?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
   gapClassName?: string;
   trailClassName?: string;
+  /**
+   * Group the pinned content and centre it vertically, instead of letting the
+   * track absorb all the slack.
+   *
+   * Use it when the cards have a real height of their own. The default —
+   * track stretched with flex-1 — hands the cards the whole screen, which is
+   * right when they should fill it and wrong when they should not: a card with
+   * a fixed height then sits at the top with the leftover space dumped
+   * underneath it, and anything that lifts on hover or scroll has no room
+   * above it to move into.
+   */
+  centered?: boolean;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -120,7 +136,11 @@ export function HorizontalPan({
         so every px of padding here is a px the cards do not get. At py-14 the
         cards came out 336px tall and their content overflowed.
       */}
-      <div className="flex flex-col py-16 md:h-[100dvh] md:py-10">
+      <div
+        className={`flex flex-col py-16 md:h-[100dvh] md:py-10 ${
+          centered ? "md:justify-center" : ""
+        }`}
+      >
         {header}
         {/*
           On desktop the track starts one full viewport to the right, so every
@@ -132,10 +152,13 @@ export function HorizontalPan({
         */}
         <div
           ref={trackRef}
-          className={`mt-10 flex flex-col px-6 md:mt-6 md:w-max md:min-h-0 md:flex-1 md:flex-row md:px-0 md:pl-[88vw] ${trailClassName} ${gapClassName}`}
+          className={`mt-10 flex flex-col px-6 md:mt-6 md:w-max md:flex-row md:px-0 md:pl-[88vw] ${
+            centered ? "md:shrink-0" : "md:min-h-0 md:flex-1"
+          } ${trailClassName} ${gapClassName}`}
         >
           {children}
         </div>
+        {footer}
       </div>
     </div>
   );

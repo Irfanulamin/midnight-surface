@@ -5,53 +5,50 @@ import { Accordion, AccordionItem } from "@/components/ui/accordion";
 import { Reveal } from "@/components/ui/reveal";
 
 /*
- * The Figma only specifies body copy for the first row — every other row is
- * drawn collapsed, so its content is unknown. The same placeholder is reused
- * across all of them rather than inventing eight different service blurbs.
- * The tag sets are a guess at the stack; replace both when real copy exists.
+ * The Figma only specifies body copy for the first row; the rest are drawn
+ * collapsed. Copy written to the studio's real scope (UI and web design,
+ * WordPress and React builds, full-stack, databases, AI). Tags name the actual
+ * stack per service.
  */
-const PLACEHOLDER_BODY =
-  "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley.";
-
 const services = [
   {
     name: "Website Design",
-    body: PLACEHOLDER_BODY,
+    body: "We design every page around the one thing a visitor came to do, so the layout leads them there instead of getting in the way. You get a build-ready design, not just a nice picture.",
     tags: ["Figma", "HTML", "CSS", "Node.js"],
   },
   {
     name: "Website Development",
-    body: PLACEHOLDER_BODY,
+    body: "We build fast, responsive sites in Next.js and TypeScript that hold up as your traffic grows. Clean, documented code your team can read, not a black box only we can touch.",
     tags: ["Next.js", "TypeScript", "Node.js"],
   },
   {
     name: "UI/UX Design",
-    body: PLACEHOLDER_BODY,
+    body: "We map the real path your users take, prototype it, then turn it into a design system your product can grow on. Fewer dead ends, more tasks people actually finish.",
     tags: ["Figma", "Prototyping", "Design Systems"],
   },
   {
     name: "Website Redesign",
-    body: PLACEHOLDER_BODY,
+    body: "We audit what your current site is costing you in speed and lost visitors, then rebuild it without losing your search rankings. Your content and SEO carry over intact.",
     tags: ["Audit", "Migration", "SEO"],
   },
   {
     name: "WordPress Development",
-    body: PLACEHOLDER_BODY,
+    body: "We build WordPress sites your team can actually update, with clean templates instead of a pile of plugins. Edit your own pages without fear of breaking the layout.",
     tags: ["WordPress", "PHP", "Elementor"],
   },
   {
     name: "E-commerce Development",
-    body: PLACEHOLDER_BODY,
+    body: "We build stores on Shopify or headless setups that check out fast and win back abandoned carts. Fewer steps between the product page and a paid order.",
     tags: ["Shopify", "Stripe", "Headless"],
   },
   {
     name: "Custom Web Applications",
-    body: PLACEHOLDER_BODY,
+    body: "We build the tools off-the-shelf software cannot, from dashboards to booking systems, wired straight to your database and APIs. Software shaped around how you actually work.",
     tags: ["React", "APIs", "Databases"],
   },
   {
     name: "AI Integration",
-    body: PLACEHOLDER_BODY,
+    body: "We add AI where it saves real time: drafting replies, answering support questions, clearing the busywork. Practical features your customers feel, not a chatbot bolted on for show.",
     tags: ["LLMs", "Automation", "Chatbots"],
   },
 ];
@@ -99,7 +96,6 @@ export function Services() {
               key={service.name}
               delay={Math.min(index, 3) * 0.06}
               duration={0.6}
-              amount={0.4}
             >
               <AccordionItem
                 index={index}

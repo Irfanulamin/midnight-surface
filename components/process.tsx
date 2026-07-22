@@ -7,11 +7,14 @@ import {
   TrendUp,
 } from "@phosphor-icons/react/ssr";
 
-import { ProcessTrack } from "@/components/process-track";
+import { ProcessCarousel } from "@/components/process-track";
 import { SectionIntro } from "@/components/section-intro";
-import { HorizontalPan } from "@/components/ui/horizontal-pan";
 
-/* Six steps, read off components S1-S6 in the Figma. */
+/*
+ * Six steps. The Figma draws five step cards (S1-S5) but six pagination dots,
+ * so the sixth step existed in the design's intent even though its card was
+ * never drawn — 06 Grow Together fills that slot and keeps the dots honest.
+ */
 const steps = [
   {
     n: "01",
@@ -59,68 +62,65 @@ export function Process() {
         sequence, and a marquee showed them as an undifferentiated loop the eye
         slides off. Pinned, each step arrives on its own and uncovers itself, so
         the section reads in the order the process actually happens.
+
+        The carousel is a Client Component (it shares the active index between
+        the cards and the pagination dots); the header stays server-rendered
+        and crosses the boundary as JSX.
+
+        Icons are rendered here and passed down as elements because a component
+        reference cannot cross that boundary. Phosphor writes size onto the
+        SVG's width/height attributes, so the size-* utilities (CSS) win and
+        scale it without a second icon.
       */}
-      <HorizontalPan
-        /*
-          Enough trailing room for step 06 to reach the middle of the screen.
-          At the default 12vw the track stops with the last card pinned near the
-          right edge, so it never crossed the centre band and never lit up.
+      {/*
+        The heading sits OUTSIDE the pinned block, and that is what makes the
+        cards their real size.
 
-          38vw puts its centre at ~53% of the viewport on the final frame, which
-          is inside the band. Going further (62vw was tried) just parks the card
-          left of centre and leaves a screen of empty track scrolling past.
-        */
-        trailClassName="md:pr-[38vw]"
-        header={
+        The design draws this section 1145px tall — heading, a 562px card and
+        the dots, all in one view. A pinned section is exactly one screen, so
+        on anything shorter than roughly 1050px those three cannot all fit, and
+        the card is what gives: pinning the heading too left about 390px for a
+        562px card, so its bottom — the icon — was cropped, and the dots were
+        pushed off the screen entirely.
+
+        Scrolling the heading away first hands the pinned block ~300px back,
+        which is more than the card needs. The rule stays inside the pin
+        because the choreography depends on it: resting cards sit 50px below
+        it and the active card rises 101px to cross it, both measured off the
+        design.
+      */}
+      <SectionIntro
+        className="mx-auto max-w-[1160px] px-6 pt-16 sm:pt-20 md:pt-28"
+        label="How It Works"
+        heading="A Simple Process From Idea to Launch"
+        headingClassName="mx-auto mt-7 max-w-[820px] text-ink"
+        body={
           <>
-            <SectionIntro
-              className="mx-auto max-w-[1160px] px-6"
-              label="How It Works"
-              heading="A Simple Process From Idea to Launch"
-              headingClassName="mx-auto mt-7 max-w-[820px] text-ink"
-              body={
-                <>
-                  We&apos;ve created a clear, collaborative process that keeps
-                  your project moving smoothly from the first conversation to a
-                  successful launch
-                </>
-              }
-              bodyClassName="mx-auto mt-6 max-w-[790px] text-ink-muted"
-            />
-
-            {/* 2px rule above the carousel, sampled at #e8e7e5 in the Figma. */}
-            <div className="mt-8 h-0.5 w-full bg-rule sm:mt-10" />
+            We&apos;ve created a clear, collaborative process that keeps your
+            project moving smoothly from the first conversation to a successful
+            launch
           </>
         }
-      >
-        {/*
-          The yellow in the Figma is the card's HOVER variant, not a highlight
-          on step 03 — 03 was just the card the state was demonstrated on. It is
-          driven by scroll position now rather than by the cursor, so the
-          sequence plays itself as the section scrubs; see <ProcessTrack>.
+        bodyClassName="mx-auto mt-6 max-w-[790px] text-ink-muted"
+      />
 
-          Icons are rendered here and passed down as elements because
-          ProcessTrack is a Client Component and a component reference cannot
-          cross that boundary. Phosphor writes size onto the SVG's width/height
-          attributes, so the size-* utilities (CSS) win and scale it without a
-          second icon.
-        */}
-        <ProcessTrack
-          steps={steps.map((step) => ({
-            n: step.n,
-            title: step.title,
-            body: step.body,
-            icon: (
-              <step.Icon
-                size={84}
-                weight="thin"
-                aria-hidden
-                className="size-[56px] sm:size-[64px] md:size-[72px]"
-              />
-            ),
-          }))}
-        />
-      </HorizontalPan>
+      <ProcessCarousel
+        /* 2px rule above the carousel, sampled at #e8e7e5 in the Figma. */
+        header={<div className="h-0.5 w-full bg-rule" />}
+        steps={steps.map((step) => ({
+          n: step.n,
+          title: step.title,
+          body: step.body,
+          icon: (
+            <step.Icon
+              size={120}
+              weight="thin"
+              aria-hidden
+              className="size-[80px] sm:size-[120px] pin-short:size-[80px]"
+            />
+          ),
+        }))}
+      />
     </section>
   );
 }

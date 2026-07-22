@@ -3,6 +3,8 @@
 import { useCallback, useRef, useState } from "react";
 import { useMotionValueEvent, useScroll } from "motion/react";
 
+import { HorizontalPan } from "@/components/ui/horizontal-pan";
+
 export type Step = {
   n: string;
   title: string;
@@ -13,7 +15,11 @@ export type Step = {
 };
 
 /*
- * The six step cards, with exactly one lit at a time.
+ * The step carousel: pinned pan, six cards with exactly one lit at a time, and
+ * the design's pagination dots underneath. It owns the <HorizontalPan> rather
+ * than being slotted into one, because the active index has to reach both the
+ * cards (inside the panning track) and the dots (below it, not panning), and
+ * that shared state needs a common client-side parent.
  *
  * The highlight used to be a hover state, so the steps only read as a sequence
  * if you dragged a cursor across them. It is driven by position now, so the
@@ -22,7 +28,7 @@ export type Step = {
  * takes over.
  *
  * Nearest-to-centre rather than an IntersectionObserver band, because "one at a
- * time" cannot be expressed as a band. Cards sit on a 380px pitch with a 40px
+ * time" cannot be expressed as a band. Cards sit on a 384px pitch with a 24px
  * gap, so any observer window wider than that gap catches two neighbours at
  * once, and any window narrower than it drops to zero while a gap crosses the
  * middle. Measuring distance to the centre has neither failure: there is always
@@ -36,7 +42,13 @@ export type Step = {
  * than once per frame. This is the sanctioned way to read scroll — a raw
  * scroll listener is banned by the taste skill.
  */
-export function ProcessTrack({ steps }: { steps: Step[] }) {
+export function ProcessCarousel({
+  header,
+  steps,
+}: {
+  header?: React.ReactNode;
+  steps: Step[];
+}) {
   const refs = useRef<(HTMLElement | null)[]>([]);
   // -1 = nothing lit, which is correct until the section is actually on screen.
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -73,18 +85,53 @@ export function ProcessTrack({ steps }: { steps: Step[] }) {
   useMotionValueEvent(scrollY, "change", measure);
 
   return (
-    <>
+    <HorizontalPan
+      /*
+        Enough trailing room for step 06 to reach the middle of the screen.
+        At the default 12vw the track stops with the last card pinned near the
+        right edge, so it never crossed the centre band and never lit up.
+
+        38vw puts its centre at ~53% of the viewport on the final frame, which
+        is inside the band. Going further (62vw was tried) just parks the card
+        left of centre and leaves a screen of empty track scrolling past.
+      */
+      trailClassName="md:pr-[38vw]"
+      /* 24px between cards at md, exactly the design's gap. */
+      gapClassName="gap-8 md:gap-6"
+      /*
+        The cards have a real height (562px at lg), so the track must not
+        stretch to fill the screen — grouped and centred, the leftover height
+        sits above and below the whole block instead of being dumped under the
+        cards, and the space above is what the active card lifts into.
+      */
+      centered
+      header={header}
+      footer={<Dots count={steps.length} active={activeIndex} />}
+    >
       {steps.map((step, i) => {
         const active = i === activeIndex;
         return (
           <div
             key={step.n}
-            className="w-full md:h-full md:w-[340px] md:shrink-0 md:py-4"
+            /*
+              pt-[26px] on top of the track's own mt-6 puts 50px between the
+              rule and a resting card, which is the design's gap.
+            */
+            className="w-full md:w-[360px] md:shrink-0 md:pt-[26px] lg:min-w-[360px]"
           >
             {/*
-              No border and no shadow at rest: pixel-sampling the card's top
-              edge in the Figma showed #fbf9f5 -> #f6f2e9 with no intermediate
-              line at all.
+              No border and no shadow, active or not: in the Figma the active
+              card is a flat yellow plane; the raise alone does the separating.
+
+              The raise is the design's line-crossing move — at rest the cards
+              sit 40px below the rule that ends the header (track mt-6 + this
+              wrapper's pt-4), and the active card translates up 64px, putting
+              its top edge 24px above the rule. In the Figma the geometry is
+              50px below / 51px above on a 562px card; ours is scaled to the
+              viewport-constrained card height. The track paints after the
+              header, so the raised card covers the rule rather than sliding
+              under it. Below md there is no rule to cross, so the lift stays
+              at the subtle 12px.
 
               700ms, not the 500ms used elsewhere: this transition is the
               storytelling beat, so it wants to be seen rather than snapped
@@ -92,41 +139,104 @@ export function ProcessTrack({ steps }: { steps: Step[] }) {
               reduced-motion users the colour change, which carries the same
               information without moving anything.
 
-              The wrapper's md:py-4 gives the lift somewhere to go — the pan
-              clips its overflow, so a card flush with the track would have its
-              raised top edge cut off. overflow-hidden on the card is a guard
-              for short viewports, where the icon would otherwise spill past the
-              rounded corner.
+              overflow-hidden on the card is a guard for short viewports, where
+              the corner icon would otherwise spill past the rounded corner.
+            */}
+            {/*
+              Values below are the Figma's own, not approximations: 30px card
+              padding (70px on top), 16px label in #399e98 at 50%, 96px
+              SemiBold number and 32px title in #286f6b at 50% (both turning
+              #1c5a55 — the teal token — on the active card), a 64px gap
+              between number and title, 18px body at 1.7 line height, and a
+              120px icon in the bottom-right corner. The icon is in flow after
+              an mt-auto, so on cards squeezed shorter than the design's 562px
+              it clips at the bottom edge instead of colliding with the body.
+              `pin-short` compresses type and gaps on pinned viewports that
+              cannot fit the full-scale card — see globals.css.
+
+              Size floors, climbing by breakpoint: 470px stacked, 510px once
+              the pan takes over at md, and the design's 360x562 at lg.
+
+              The `min(…, 100%)` is load-bearing and must not be simplified to
+              a bare pixel floor. The pinned section is exactly 100dvh, so a
+              card taller than its track does not make the section scroll — the
+              overflow is simply never reachable, and what falls off the bottom
+              is the icon, which sits last. A plain `min-h-[562px]` did exactly
+              that on any viewport under ~1080px tall, and took the pagination
+              dots below the fold with it.
+
+              Capping the floor at 100% of the track keeps the design's size
+              wherever it fits and quietly yields to the available height
+              wherever it does not, so nothing is ever cropped. On a viewport
+              tall enough for the full-size type (the `pin-short` cut-off at
+              1079px) the track is already ~584px, so the 562px card is what
+              you get there anyway — the clamp only ever engages on the screens
+              where the alternative was a broken card.
             */}
             <article
               ref={(el) => {
                 refs.current[i] = el;
               }}
               data-active={active}
-              className="group flex h-full min-h-[400px] flex-col justify-between overflow-hidden rounded-2xl bg-cream-light p-6 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] data-[active=true]:bg-yellow data-[active=true]:shadow-[0_20px_44px_-24px_rgb(0_0_0/0.3)] motion-safe:data-[active=true]:-translate-y-3 sm:p-7 md:min-h-0 md:p-7"
+              className="group relative flex min-h-[470px] w-full flex-col overflow-hidden rounded-lg bg-cream-light p-6 pt-8 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] data-[active=true]:bg-yellow motion-safe:data-[active=true]:-translate-y-3 sm:p-[30px] sm:pt-[70px] md:min-h-[510px] md:motion-safe:data-[active=true]:-translate-y-16 lg:h-[562px] lg:w-[360px] lg:motion-safe:data-[active=true]:-translate-y-[101px] pin-short:pt-[30px]"
             >
-              <div>
-                <p className="text-[13px] tracking-[0.06em] text-teal/60 transition-colors duration-700 group-data-[active=true]:text-teal sm:text-[15px]">
-                  /STEPS
-                </p>
-                <p className="mt-3 text-[56px] font-bold leading-none text-teal/40 transition-colors duration-700 group-data-[active=true]:text-teal-deep sm:mt-4 sm:text-[66px] md:text-[72px]">
-                  {step.n}
-                </p>
-                <h3 className="mt-6 text-[20px] font-semibold text-teal/70 transition-colors duration-700 group-data-[active=true]:text-teal-deep sm:mt-8 sm:text-[22px] md:text-[24px]">
-                  {step.title}
-                </h3>
-                <p className="mt-3 max-w-[280px] text-[15px] leading-7 text-teal/50 transition-colors duration-700 group-data-[active=true]:text-teal-deep/80 sm:mt-4 sm:text-[16px]">
-                  {step.body}
-                </p>
-              </div>
+              <p className="text-[14px] font-semibold tracking-[0.05em] text-[#399e98]/50 transition-colors duration-700 group-data-[active=true]:text-teal/70 sm:text-[16px]">
+                /STEPS
+              </p>
+              <p className="mt-4 text-[72px] font-semibold leading-[1.1] tracking-[-0.02em] text-[#286f6b]/50 transition-colors duration-700 group-data-[active=true]:text-teal sm:mt-6 sm:text-[96px] pin-short:mt-4 pin-short:text-[72px]">
+                {step.n}
+              </p>
+              <h3 className="mt-8 text-[24px] font-semibold leading-[1.15] tracking-[-0.05em] text-[#286f6b]/50 transition-colors duration-700 group-data-[active=true]:text-teal sm:mt-16 sm:text-[32px] pin-short:mt-7 pin-short:text-[25px]">
+                {step.title}
+              </h3>
+              <p className="mt-4 max-w-[300px] text-[16px] leading-[1.7] text-ink/40 transition-colors duration-700 group-data-[active=true]:text-ink/70 sm:mt-6 sm:text-[18px] pin-short:mt-3 pin-short:text-[16px]">
+                {step.body}
+              </p>
 
-              <div className="shrink-0 self-end text-teal/40 transition-colors duration-700 group-data-[active=true]:text-teal-deep">
+              <div className="mt-auto -mr-2 -mb-2 shrink-0 self-end pt-4 text-[#286f6b]/50 transition-colors duration-700 group-data-[active=true]:text-teal">
                 {step.icon}
               </div>
             </article>
           </div>
         );
       })}
-    </>
+    </HorizontalPan>
+  );
+}
+
+/*
+ * The design's pagination: six 14px dots with the active one swapped for a
+ * 16px coral dot inside a coral-tinted ring (sampled rgba(253,124,90,0.2) —
+ * exactly coral/20). Rendered as one shape whose colours and size transition,
+ * so the state hands over smoothly instead of teleporting.
+ *
+ * Purely decorative — the scrub is the control — so it is aria-hidden. md-only
+ * because the mobile fallback is a plain vertical stack with nothing to page.
+ */
+function Dots({ count, active }: { count: number; active: number }) {
+  return (
+    <div
+      aria-hidden
+      /* 64px below the cards at md, which is the design's gap. */
+      className="mt-8 hidden shrink-0 items-center justify-center gap-3 md:mt-16 md:flex"
+    >
+      {Array.from({ length: count }, (_, i) => {
+        const lit = i === active;
+        return (
+          <span
+            key={i}
+            className={`rounded-full p-[3px] transition-colors duration-300 ${
+              lit ? "bg-coral/20" : "bg-transparent"
+            }`}
+          >
+            <span
+              className={`block rounded-full transition-all duration-300 ${
+                lit ? "size-4 bg-coral" : "size-3.5 bg-rule"
+              }`}
+            />
+          </span>
+        );
+      })}
+    </div>
   );
 }

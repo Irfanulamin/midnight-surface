@@ -1,6 +1,9 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { motion, useInView, useReducedMotion } from "motion/react";
+
+import { EASE, VIEWPORT } from "@/components/ui/motion";
 
 /*
  * Word-by-word mask reveal.
@@ -25,7 +28,28 @@ import { motion, useReducedMotion } from "motion/react";
  * Only transform moves, so this stays on the compositor.
  */
 
-const EASE = [0.16, 1, 0.3, 1] as const;
+/*
+ * Same trigger as the reveal primitives, and for the same reload reason:
+ * `once` fires on first entry, and anything already scrolled past on a
+ * restored-scroll reload is shown at once (off screen) rather than left hidden.
+ * See the fuller note on useReveal in components/ui/reveal.tsx.
+ */
+function useReveal<T extends Element>(amount: number) {
+  const ref = useRef<T>(null);
+  const inView = useInView(ref, { once: true, amount });
+  const [passed, setPassed] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || inView || passed) return;
+    if (el.getBoundingClientRect().bottom <= 0) {
+      const id = requestAnimationFrame(() => setPassed(true));
+      return () => cancelAnimationFrame(id);
+    }
+  }, [inView, passed]);
+
+  return [ref, inView || passed] as const;
+}
 
 const tags = {
   h1: motion.h1,
@@ -43,7 +67,7 @@ export function TextReveal({
   stagger = 0.055,
   duration = 0.9,
   /** Fraction of the heading that must be visible before it fires. */
-  amount = 0.4,
+  amount = VIEWPORT.in,
 }: {
   /**
    * Plain string only — it has to be split on spaces. Mixed markup (a coloured
@@ -58,6 +82,7 @@ export function TextReveal({
   amount?: number;
 }) {
   const reduce = useReducedMotion();
+  const [ref, shown] = useReveal<HTMLElement>(amount);
   const words = text.split(" ");
 
   if (reduce) {
@@ -69,6 +94,7 @@ export function TextReveal({
 
   return (
     <Tag
+      ref={ref as React.Ref<HTMLHeadingElement>}
       className={className}
       /*
        * Splitting into per-word spans leaves the text readable to a screen
@@ -78,8 +104,7 @@ export function TextReveal({
        */
       aria-label={text}
       initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount }}
+      animate={shown ? "visible" : "hidden"}
       variants={{
         hidden: {},
         visible: {
@@ -116,7 +141,7 @@ export function MaskReveal({
   className,
   delay = 0,
   duration = 0.9,
-  amount = 0.5,
+  amount = VIEWPORT.in,
 }: {
   children: React.ReactNode;
   className?: string;
@@ -125,13 +150,14 @@ export function MaskReveal({
   amount?: number;
 }) {
   const reduce = useReducedMotion();
+  const [ref, shown] = useReveal<HTMLSpanElement>(amount);
 
   if (reduce) {
     return <span className={`block ${className ?? ""}`}>{children}</span>;
   }
 
   /*
-   * The viewport trigger sits on the OUTER mask, with the inner span driven by
+   * The trigger sits on the OUTER mask, with the inner span driven by
    * variants — it cannot go on the inner span itself.
    *
    * IntersectionObserver clips an element's intersection rect against its
@@ -147,10 +173,10 @@ export function MaskReveal({
    */
   return (
     <motion.span
+      ref={ref}
       className={`block overflow-hidden pb-[0.14em] mb-[-0.14em] ${className ?? ""}`}
       initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount }}
+      animate={shown ? "visible" : "hidden"}
     >
       <motion.span
         className="block"

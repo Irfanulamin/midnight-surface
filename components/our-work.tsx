@@ -4,26 +4,31 @@ import { SectionIntro } from "@/components/section-intro";
 import { HorizontalPan } from "@/components/ui/horizontal-pan";
 import { CurtainReveal } from "@/components/ui/reveal";
 
+/*
+ * Realistic placeholder projects (there are only two work images in the
+ * export, so they repeat). Swap titles, copy and images when real case studies
+ * exist.
+ */
 const projects = [
   {
     src: "/design/work-01.png",
-    title: "Website Development",
-    body: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+    title: "Northbend Coffee",
+    body: "A one-page ordering site for a local roaster. Live in eight days, with mobile orders climbing through the first month.",
   },
   {
     src: "/design/work-02.png",
-    title: "Website Development",
-    body: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+    title: "Halden Strength",
+    body: "A gym membership site rebuilt around how people actually sign up. A cleaner flow meant more joins completed, not just started.",
   },
   {
     src: "/design/work-01.png",
-    title: "Website Development",
-    body: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+    title: "Meridian Dental",
+    body: "A booking-first site for a two-chair practice. Fewer phone calls at the desk, more appointments booked overnight.",
   },
   {
     src: "/design/work-02.png",
-    title: "Website Development",
-    body: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+    title: "Verde Landscaping",
+    body: "A portfolio and quote-request site that turns weekend browsers into Monday enquiries.",
   },
 ];
 
@@ -39,7 +44,7 @@ export function OurWork() {
             label="Our Work"
             heading="Websites That Deliver Real Results"
             headingClassName="mt-7 max-w-[620px] text-ink"
-            body="Every project is designed with one goal in mind—helping businesses attract more customers, generate leads, and grow online"
+            body="Every project is designed with one goal in mind: helping businesses attract more customers, generate leads, and grow online"
             bodyClassName="mt-6 max-w-[640px] text-ink-muted"
           />
         }

@@ -65,11 +65,40 @@ export function WhyUs() {
                 height={1480}
                 className="pointer-events-none absolute inset-0 h-full w-full object-cover"
               />
-              <div className="relative m-4 rounded-xl bg-cream px-5 py-4 sm:px-6 sm:py-5">
-                <h3 className="text-[19px] font-semibold leading-snug text-teal-deep sm:text-[21px]">
-                  We Made Custom Design{" "}
-                  <span className="bg-yellow px-1">Not Templates</span>
-                </h3>
+              {/*
+                The cream panel is the top sheet of a stack: two green sheets
+                (sampled #6d938e and #69928f at 75%) peek 9px and 20px above
+                its edge, exactly as the Figma layers them. Only their tops are
+                visible, so they are simple absolutely-positioned tabs.
+              */}
+              <div className="relative m-4">
+                <div
+                  aria-hidden
+                  className="absolute inset-x-[30px] -top-5 h-8 rounded-t-[13px] bg-[#69928f]/75"
+                />
+                <div
+                  aria-hidden
+                  className="absolute inset-x-[9px] -top-[9px] h-8 rounded-t-[15px] bg-[#6d938e]"
+                />
+                <div className="relative rounded-2xl bg-cream px-5 py-4 sm:px-6 sm:py-5">
+                  {/*
+                    The yellow is a marker strip — a half-em band sitting
+                    behind the lower part of the words, per the Figma (an 18px
+                    strip under 36px text) — not a full background around the
+                    span. nowrap keeps the phrase on one line so the strip has
+                    a single line box to span.
+                  */}
+                  <h3 className="text-[24px] font-semibold leading-[1.1] text-teal-deep sm:text-[28px]">
+                    We Made Custom Design{" "}
+                    <span className="relative whitespace-nowrap">
+                      <span
+                        aria-hidden
+                        className="absolute inset-x-0 -bottom-[0.1em] h-[0.5em] bg-yellow"
+                      />
+                      <span className="relative">Not Templates</span>
+                    </span>
+                  </h3>
+                </div>
               </div>
             </article>
 
@@ -113,24 +142,53 @@ export function WhyUs() {
             </article>
 
             <article className="relative min-h-[280px] flex-1 overflow-hidden rounded-2xl bg-cream md:min-h-0">
-              <h3 className="relative z-10 p-6 text-[19px] font-semibold leading-snug text-teal-deep sm:p-7 sm:text-[21px]">
-                Support After{" "}
-                <span className="bg-coral px-1 text-white">Finish</span>
+              {/*
+                "Finish" sits on a solid coral bar that starts where the text
+                starts and runs clean off the card's right edge — in the Figma
+                the rectangle is wider than the card and clipped by it. A block
+                span with only a left margin reproduces that: it fills the
+                remaining width to the edge, no right padding to stop short.
+              */}
+              <h3 className="relative z-10 pt-6 text-[19px] font-semibold leading-snug text-teal-deep sm:pt-7 sm:text-[21px]">
+                <span className="block px-6 sm:px-7">Support After</span>
+                <span className="mt-1.5 ml-6 block bg-coral py-0.5 text-white sm:ml-7">
+                  Finish
+                </span>
               </h3>
-              {/* Yellow pinwheel sits behind the illustration, bottom-left. */}
+              {/*
+                Both measured off the Figma's 364x242 card (nodes 146:30551 and
+                146:33186), and both sized as a share of the card so they hold
+                at any width:
+
+                  high-five   x 170, y 109, 194.4 x 133.4
+                              -> right edge 364.4 and bottom edge 242.4 on a
+                                 364x242 card, i.e. flush into the corner
+                              -> 194.4 / 364 = 53.4% of the card
+
+                  pinwheel    x -24, y 185.4, 114.3 square
+                              -> 114.3 / 364 = 31.4% of the card
+                              -> hangs 24 off the left and 57.7 below the
+                                 bottom, which is 21% and 50.5% of its OWN size
+
+                The pinwheel's bleed is written as translates of itself rather
+                than as fixed px offsets. It was -left-6 / -bottom-14 before,
+                which is right only on a card that happens to be exactly 364
+                wide — every other width left it sitting at the wrong depth in
+                the corner. As a share of its own size it stays put.
+              */}
               <Image
-                src="/design/high-five-icon.png"
+                src="/design/bento-pinwheel.png"
                 alt=""
-                width={362}
-                height={324}
-                className="pointer-events-none absolute -bottom-2 left-0 w-[86px]"
+                width={458}
+                height={458}
+                className="pointer-events-none absolute bottom-0 left-0 w-[25.5%]  "
               />
               <Image
-                src="/design/high-five.png"
+                src="/design/bento-high-five.png"
                 alt=""
-                width={776}
-                height={532}
-                className="pointer-events-none absolute -bottom-1 left-1/2 w-[72%] -translate-x-1/2"
+                width={778}
+                height={534}
+                className="pointer-events-none absolute right-0 bottom-0 w-[44%]"
               />
             </article>
           </RevealItem>
@@ -160,9 +218,11 @@ export function WhyUs() {
                 className="my-auto w-[62%] self-center"
               />
               <div className="rounded-xl bg-teal-deep px-5 py-4 sm:px-6 sm:py-5">
+                {/* The yellow spans all of "Week Not Months" in the Figma,
+                    not just "Week". */}
                 <p className="text-[19px] font-semibold leading-snug text-white sm:text-[21px]">
-                  Launch In A <span className="text-yellow">Week</span> Not
-                  Months
+                  Launch In A{" "}
+                  <span className="text-yellow">Week Not Months</span>
                 </p>
               </div>
             </article>

@@ -1,18 +1,50 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, CheckCircle } from "@phosphor-icons/react/ssr";
 
-import { Magnetic } from "@/components/ui/magnetic";
+import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/ui/reveal";
 import { MaskReveal } from "@/components/ui/text-reveal";
 
 export function CtaBanner() {
   return (
     <section className="px-6 pb-16 sm:pb-20 md:pb-28">
-      <Reveal
-        amount={0.2}
-        className="mx-auto max-w-[1160px] rounded-2xl bg-teal px-6 py-12 text-white sm:px-10 sm:py-16 md:px-14 md:py-20"
-      >
-        <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
+      <Reveal className="relative mx-auto max-w-[1160px] overflow-hidden rounded-[24px] bg-[#28706d] px-6 py-12 text-white sm:px-10 sm:py-16 md:px-14 md:py-20">
+        {/*
+          Three layers, bottom up: the flat #28706d card, the grid, then the
+          white gradient over the top of it.
+
+          There was a fourth — the card colour rising from transparent, to fade
+          the grid out toward the bottom — and it is gone on purpose. Ending at
+          fully opaque #28706d, it did not fade the grid so much as erase it,
+          and with the grid already at 10% there was nothing left to see. The
+          white gradient does that job on its own: it is strongest at the top
+          where it lifts the whole card, and thins toward the bottom, so the
+          grid quietly loses contrast as it descends without being painted out.
+
+          All of it paints below the content: the content div is positioned, so
+          it comes after these in paint order regardless of anything else.
+        */}
+        {/*
+          The grid, a 4x export of the 1128x412 card — its aspect matches the
+          card's exactly, so at the design size the spacing lands as drawn.
+          `object-cover` rather than a stretch: the card's aspect moves with
+          the viewport, and scaling the artwork proportionally and cropping the
+          excess keeps the grid square, where filling would shear it into
+          diamonds.
+        */}
+        <Image
+          src="/design/grid.png"
+          alt=""
+          aria-hidden
+          width={4512}
+          height={1648}
+          className="opacity-25
+           pointer-events-none absolute inset-0 h-full w-full object-cover bg-[linear-gradient(0deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.30)_100%)]"
+        />
+        
+
+        <div className="relative flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
           <div>
             <p className="text-[16px] text-white/80 sm:text-[19px]">
               Are You Still Confused To Work With Us?
@@ -52,11 +84,8 @@ export function CtaBanner() {
             <p className="mt-1 text-[17px] sm:text-[19px]">
               Successfully Completed 100+ Project
             </p>
-            <Magnetic className="mt-7">
-              <Link
-                href="/contact"
-                className="group inline-flex items-center gap-2 rounded-pill bg-yellow px-8 py-4 text-[16px] font-medium text-ink transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-yellow-strong hover:shadow-[0_14px_30px_-12px_rgb(0_0_0/0.45)] active:scale-[0.98]"
-              >
+            <Button asChild size="lg" className="group mt-7">
+              <Link href="/contact">
                 Contact Us
                 <ArrowUpRight
                   size={18}
@@ -65,7 +94,7 @@ export function CtaBanner() {
                   className="transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                 />
               </Link>
-            </Magnetic>
+            </Button>
           </div>
         </div>
       </Reveal>

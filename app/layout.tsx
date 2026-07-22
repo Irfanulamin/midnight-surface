@@ -31,7 +31,7 @@ const interDisplay = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Midnight Surface — Everything Your Business Needs in One Website",
+  title: "Midnight Surface",
   description:
     "Professional websites for small businesses—designed, developed, launched, and supported without breaking your bank.",
 };

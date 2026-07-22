@@ -5,6 +5,7 @@ import { OurWork } from "@/components/our-work";
 import { Pricing } from "@/components/pricing";
 import { Process } from "@/components/process";
 import { Services } from "@/components/services";
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Testimonials } from "@/components/testimonials";
 import { TrustedBy } from "@/components/trusted-by";
@@ -26,6 +27,7 @@ export default function Home() {
         <Faq />
         <CtaBanner />
       </main>
+      <SiteFooter />
     </>
   );
 }

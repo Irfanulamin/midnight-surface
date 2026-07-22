@@ -93,41 +93,6 @@ html.lenis body {
 }
 
 /*
- * Infinite marquee.
- *
- * The track renders its content twice and translates by exactly -50%, so the
- * second copy lands where the first began and the loop is seamless. Driven by
- * CSS rather than JS: it is a single compositor-thread transform that keeps
- * running without main-thread work, and it can be paused declaratively.
- */
-@keyframes marquee-scroll {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-.marquee-track {
-  animation: marquee-scroll var(--marquee-duration, 40s) linear infinite;
-  will-change: transform;
-}
-
-/* Same latch problem as .lift — a tap would pause the track permanently. */
-@media (hover: hover) {
-  .marquee:hover .marquee-track {
-    animation-play-state: paused;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .marquee-track {
-    animation: none;
-  }
-}
-
-/*
  * Shared hover physics.
  *
  * One curve everywhere — cubic-bezier(0.16, 1, 0.3, 1) — so every interactive
@@ -135,19 +100,17 @@ html.lenis body {
  * transform and box-shadow move; nothing here triggers layout.
  */
 .lift {
-  transition:
-    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /*
  * Hover-capable pointers only. On touch, :hover latches after a tap and the
  * card stays raised until something else is tapped, which reads as a bug.
+ * Transform only — no shadow: the design keeps every surface flat.
  */
 @media (hover: hover) {
   .lift:hover {
     transform: translateY(-6px);
-    box-shadow: 0 22px 44px -24px rgb(0 0 0 / 0.3);
   }
 }
 
@@ -159,12 +122,111 @@ html.lenis body {
   }
 }
 
+/*
+ * "Popular" badge attention loop.
+ *
+ * This page has no blur and no shadows anywhere: depth is shown by offsetting
+ * flat sheets of solid brand colour (the "We Made Custom Design" card stacks
+ * two green sheets behind its cream panel; the coral bar runs off the card
+ * edge). A soft glow is a different material entirely and reads as borrowed
+ * from another site, so the badge's attention beat is built from the same
+ * device the design already uses: a hard-edged yellow sheet sitting behind the
+ * coral pill, rocking in and out like a sticker not quite pressed down.
+ *
+ * CSS rather than JS for the same reason the marquee is CSS: it loops forever,
+ * so it belongs on the compositor where it costs no main-thread work and keeps
+ * running while React is busy. Only the entry is scripted, because it has to
+ * wait for the card to arrive (see components/popular-badge.tsx).
+ *
+ * Transform only — no blur, no box-shadow, nothing that repaints.
+ *
+ * The class is only applied once the badge has finished arriving, so the sheet
+ * stays hidden behind the pill during the entrance instead of rocking against
+ * it — two uncoordinated transforms on a parent and its child during the same
+ * half second was most of what made the badge look unsettled.
+ *
+ * Slow and shallow on purpose: 4.6s on a sine-like ease, peaking at a 3px
+ * offset and 2 degrees. Enough to catch the eye in peripheral vision, little
+ * enough that looking straight at it reads as a resting layered sticker rather
+ * than something twitching.
+ */
+@keyframes badge-sticker {
+  0%,
+  100% {
+    transform: translate(1px, 1.5px) rotate(0.5deg);
+  }
+  50% {
+    transform: translate(3px, 3.5px) rotate(2deg);
+  }
+}
+
+.badge-sticker {
+  animation: badge-sticker 4.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /*
+   * Rests at the 0% offset rather than hiding: the layered sheet is a static
+   * part of the badge's look, and only its movement is the motion.
+   */
+  .badge-sticker {
+    animation: none;
+    transform: translate(1px, 1.5px) rotate(0.6deg);
+  }
+}
+
+/*
+ * The How It Works cards are drawn 562px tall in the Figma, which only fits
+ * inside the pinned 100dvh section when the viewport is tall (the header,
+ * paddings and dots eat ~520px; 520 + 562 ≈ 1080). So the cards carry
+ * design-exact sizes by default, and `pin-short` targets pinned desktops that
+ * are NOT tall enough for that scale, compressing type and gaps only where
+ * the pin actually squeezes the card.
+ */
+@custom-variant pin-short (@media (min-width: 768px) and (max-height: 1079px));
+
+/*
+ * Carousel autoplay countdown.
+ *
+ * The bar is not a "slide 2 of 3" indicator — it fills across the life of the
+ * current slide, empties as the next one arrives, and fills again. So it is
+ * driven by time rather than by state: a linear transform over the autoplay
+ * delay, restarted by remounting the element on each slide.
+ *
+ * CSS rather than a per-frame value, for the reason every loop here is CSS —
+ * it runs on the compositor and costs no renders, where animating a `value`
+ * prop would re-render the carousel around sixty times a second.
+ *
+ * `forwards` holds the bar full at the end, so it never flicks back to empty
+ * in the gap before the slide changes. The pause on hover matches Embla's
+ * stopOnMouseEnter: the countdown should not run while the timer behind it is
+ * suspended.
+ */
+@keyframes progress-fill {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.progress-fill {
+  animation: progress-fill var(--progress-duration, 5200ms) linear forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-fill {
+    animation: none;
+  }
+}
+
 /* Dot grid that sits behind the hero. */
 .bg-dotgrid {
   background-image: radial-gradient(
-    circle at 1px 1px,
-    rgb(0 0 0 / 0.07) 1px,
+    circle at 2px 2px,
+    rgb(0 0 0 / 0.08) 2px,
     transparent 0
   );
-  background-size: 22px 22px;
+  background-size: 44px 44px;
 }

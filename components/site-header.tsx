@@ -11,6 +11,9 @@ import {
 } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
+import { Button } from "@/components/ui/button";
+import { EASE } from "@/components/ui/motion";
+
 /*
  * In-page anchors, not routes — this is a one-page site and those routes do not
  * exist. Rendered as plain <a>, deliberately: next/link intercepts the click and
@@ -27,7 +30,6 @@ const navLinks = [
   { label: "Success Stories", href: "#success-stories" },
 ];
 
-const EASE = [0.16, 1, 0.3, 1] as const;
 
 export function SiteHeader() {
   const [condensed, setCondensed] = useState(false);
@@ -136,12 +138,9 @@ export function SiteHeader() {
         </ul>
 
         <div className="flex items-center gap-1.5 sm:gap-2">
-          <Link
-            href="/contact"
-            className="rounded-pill bg-yellow px-4 py-2.5 text-[13px] font-semibold text-ink transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 hover:bg-yellow-strong hover:shadow-[0_10px_24px_-10px_rgb(0_0_0/0.4)] active:scale-[0.97] sm:px-6 sm:py-3 sm:text-[15px]"
-          >
-            Get Started
-          </Link>
+          <Button asChild size="sm" className="font-semibold hover:-translate-y-0.5">
+            <Link href="/contact">Get Started</Link>
+          </Button>
 
           <button
             type="button"

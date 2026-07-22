@@ -1,6 +1,10 @@
+# pnpm 10 blocks dependency build scripts until each is approved.
+#
+# Both of these are first-party build tooling rather than anything incidental:
+# sharp is what Next uses to optimise the images this site is largely made of,
+# and unrs-resolver is eslint's module resolver. Left unapproved, pnpm exits
+# non-zero on every command, which takes `pnpm dev`, `pnpm lint` and the shadcn
+# CLI down with it.
 allowBuilds:
-  sharp: set this to true or false
-  unrs-resolver: set this to true or false
-ignoredBuiltDependencies:
-  - sharp
-  - unrs-resolver
+  sharp: true
+  unrs-resolver: true

@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { GrowthChart } from "@/components/growth-chart";
-import { Magnetic } from "@/components/ui/magnetic";
+import { Button, ButtonLabel } from "@/components/ui/button";
 import { RevealGroup, RevealItem } from "@/components/ui/reveal";
 import { TextReveal } from "@/components/ui/text-reveal";
 
@@ -52,28 +52,23 @@ export function Hero() {
         <RevealGroup stagger={0.11} delayChildren={0.55} amount={0.1}>
           <RevealItem>
             <p className="mx-auto mt-4 max-w-[520px] text-balance text-[15px] leading-6 text-ink-muted sm:mt-5 sm:text-[16px] sm:leading-7">
-              Professional websites for small businesses—designed, developed,
+              Professional websites for small businesses, designed, developed,
               launched, and supported without breaking your bank.
             </p>
           </RevealItem>
 
           <RevealItem>
             <div className="mt-5 flex flex-wrap items-center justify-center gap-3 sm:mt-6">
-              {/* Magnetic on the primary only — the pull is the hierarchy. */}
-              <Magnetic>
-                <Link
-                  href="/contact"
-                  className="block rounded-pill bg-yellow px-6 py-3 text-[14px] font-semibold text-ink transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-yellow-strong hover:shadow-[0_12px_28px_-12px_rgb(0_0_0/0.35)] active:scale-[0.98] sm:px-7 sm:py-3.5 sm:text-[15px]"
-                >
-                  Get a Free Consultation
+              <Button asChild className="font-semibold">
+                <Link href="/contact">
+                  <ButtonLabel>Get a Free Consultation</ButtonLabel>
                 </Link>
-              </Magnetic>
-              <Link
-                href="/work"
-                className="rounded-pill bg-white px-6 py-3 text-[14px] font-semibold text-ink shadow-[0_1px_2px_rgb(0_0_0/0.04)] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 hover:shadow-[0_12px_28px_-12px_rgb(0_0_0/0.25)] active:scale-[0.98] sm:px-7 sm:py-3.5 sm:text-[15px]"
-              >
-                View Our Work
-              </Link>
+              </Button>
+              <Button asChild variant="surface" className="font-semibold">
+                <Link href="/work">
+                  <ButtonLabel>View Our Work</ButtonLabel>
+                </Link>
+              </Button>
             </div>
           </RevealItem>
         </RevealGroup>
