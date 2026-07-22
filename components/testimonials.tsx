@@ -1,4 +1,4 @@
-import Image from "next/image";
+﻿import Image from "next/image";
 
 import { SectionHeading, SectionLabel } from "@/components/section-label";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
@@ -12,7 +12,7 @@ export function Testimonials() {
           <SectionHeading className="mx-auto mt-7 max-w-[700px] text-ink">
             Real Results for Real Businesses
           </SectionHeading>
-          <p className="mx-auto mt-6 max-w-[790px] text-[17px] leading-7 text-ink-muted">
+          <p className="mx-auto mt-6 max-w-[790px] text-[18px] leading-8 text-ink-muted">
             Every website we build is designed to solve business challenges and
             drive growth. Here&apos;s how we&apos;ve helped our clients succeed.
           </p>

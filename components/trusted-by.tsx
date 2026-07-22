@@ -1,4 +1,4 @@
-import Image from "next/image";
+﻿import Image from "next/image";
 
 import { SectionHeading } from "@/components/section-label";
 import { Marquee } from "@/components/ui/marquee";
@@ -21,7 +21,7 @@ export function TrustedBy() {
         <SectionHeading className="mx-auto max-w-[640px] text-ink">
           Businesses That Trust Our Work
         </SectionHeading>
-        <p className="mx-auto mt-6 max-w-[790px] text-[17px] leading-7 text-ink-muted">
+        <p className="mx-auto mt-6 max-w-[790px] text-[18px] leading-8 text-ink-muted">
           We&apos;re proud to partner with businesses across different
           industries, helping them build a strong online presence with websites
           that deliver real results

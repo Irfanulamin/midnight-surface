@@ -1,4 +1,4 @@
-import { CaretDown, CaretUp } from "@phosphor-icons/react/ssr";
+﻿import { CaretDown, CaretUp } from "@phosphor-icons/react/ssr";
 
 import { SectionHeading, SectionLabel } from "@/components/section-label";
 import { Accordion, AccordionItem } from "@/components/ui/accordion";
@@ -32,15 +32,17 @@ export function Faq() {
           <SectionHeading className="mt-7 text-ink">
             Everything You Need to Know
           </SectionHeading>
-          <p className="mx-auto mt-6 max-w-[790px] text-[17px] leading-7 text-ink-muted">
+          <p className="mx-auto mt-6 max-w-[790px] text-[18px] leading-8 text-ink-muted">
             Have questions? We&apos;ve answered the ones we hear most often to
             help you make an informed decision with confidence.
           </p>
         </Reveal>
 
         {/* Row 2 open on load, matching the Figma's resting state. */}
+        {/* fixedHeight reserves the tallest panel so the block never jumps. */}
         <Accordion
           defaultIndex={1}
+          fixedHeight
           className="mx-auto mt-16 max-w-[935px] space-y-4"
         >
           {faqs.map((faq, index) => (

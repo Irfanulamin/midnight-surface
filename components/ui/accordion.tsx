@@ -2,6 +2,7 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useId,
@@ -26,6 +27,7 @@ type AccordionContextValue = {
   openIndex: number | null;
   setOpenIndex: (index: number | null) => void;
   baseId: string;
+  reportMetrics: (index: number, triggerHeight: number, panelHeight: number) => void;
 };
 
 const AccordionContext = createContext<AccordionContextValue | null>(null);
@@ -42,18 +44,71 @@ export function Accordion({
   children,
   defaultIndex = null,
   className,
+  /**
+   * Reserve space for the tallest panel so the block never changes height as
+   * rows toggle. Off by default; opt in where the layout shift is disruptive.
+   */
+  fixedHeight = false,
 }: {
   children: React.ReactNode;
   /** Index open on first paint. `null` starts fully collapsed. */
   defaultIndex?: number | null;
   className?: string;
+  fixedHeight?: boolean;
 }) {
   const [openIndex, setOpenIndex] = useState<number | null>(defaultIndex);
   const baseId = useId();
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  /*
+   * Reserve = sum of the (always-collapsed) trigger rows + the tallest panel.
+   *
+   * Critically this never reads the root's own height. An earlier version did,
+   * and since the reserve is applied AS the root's min-height, every
+   * measurement included the value it had just written — the reserve grew on
+   * each ResizeObserver tick until the renderer locked up. Deriving it only
+   * from children makes the feedback loop structurally impossible.
+   */
+  const metrics = useRef<Map<number, { trigger: number; panel: number }>>(
+    new Map(),
+  );
+  const [reserve, setReserve] = useState<number | null>(null);
+
+  const reportMetrics = useCallback(
+    (index: number, triggerHeight: number, panelHeight: number) => {
+      if (!fixedHeight) return;
+
+      const prev = metrics.current.get(index);
+      if (prev && prev.trigger === triggerHeight && prev.panel === panelHeight) {
+        return;
+      }
+      metrics.current.set(index, {
+        trigger: triggerHeight,
+        panel: panelHeight,
+      });
+
+      let triggers = 0;
+      let tallestPanel = 0;
+      for (const m of metrics.current.values()) {
+        triggers += m.trigger;
+        tallestPanel = Math.max(tallestPanel, m.panel);
+      }
+      setReserve(Math.ceil(triggers + tallestPanel));
+    },
+    [fixedHeight],
+  );
 
   return (
-    <AccordionContext.Provider value={{ openIndex, setOpenIndex, baseId }}>
-      <div className={className}>{children}</div>
+    <AccordionContext.Provider
+      value={{ openIndex, setOpenIndex, baseId, reportMetrics }}
+    >
+      <div
+        ref={rootRef}
+        className={className}
+        style={reserve ? { minHeight: reserve } : undefined}
+      >
+        {children}
+      </div>
     </AccordionContext.Provider>
   );
 }
@@ -78,8 +133,9 @@ export function AccordionItem({
   className?: string;
   triggerClassName?: string;
 }) {
-  const { openIndex, setOpenIndex, baseId } = useAccordion();
+  const { openIndex, setOpenIndex, baseId, reportMetrics } = useAccordion();
   const reduce = useReducedMotion();
+  const triggerRef = useRef<HTMLHeadingElement>(null);
 
   /*
    * The panel animates to a measured pixel height, never to "auto".
@@ -98,12 +154,16 @@ export function AccordionItem({
   useEffect(() => {
     const el = contentRef.current;
     if (!el) return;
-    const measure = () => setContentHeight(el.offsetHeight);
+    const measure = () => {
+      const h = el.offsetHeight;
+      setContentHeight(h);
+      reportMetrics(index, triggerRef.current?.offsetHeight ?? 0, h);
+    };
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [index, reportMetrics]);
 
   const open = openIndex === index;
   const panelId = `${baseId}-panel-${index}`;
@@ -111,7 +171,7 @@ export function AccordionItem({
 
   return (
     <div className={className}>
-      <h3>
+      <h3 ref={triggerRef}>
         <button
           type="button"
           id={triggerId}
@@ -141,6 +201,7 @@ export function AccordionItem({
         id={panelId}
         role="region"
         aria-labelledby={triggerId}
+        data-open={open ? "true" : "false"}
         inert={!open}
         initial={false}
         animate={{ height: open ? contentHeight : 0, opacity: open ? 1 : 0 }}

@@ -1,4 +1,4 @@
-import { ArrowDownLeft, ArrowUpRight } from "@phosphor-icons/react/ssr";
+﻿import { ArrowDownLeft, ArrowUpRight } from "@phosphor-icons/react/ssr";
 
 import { SectionHeading, SectionLabel } from "@/components/section-label";
 import { Accordion, AccordionItem } from "@/components/ui/accordion";
@@ -65,7 +65,7 @@ export function Services() {
           <SectionHeading className="mt-7 text-white">
             What We Build
           </SectionHeading>
-          <p className="mx-auto mt-6 max-w-[760px] text-[17px] leading-7 text-white/70">
+          <p className="mx-auto mt-6 max-w-[760px] text-[18px] leading-8 text-white/70">
             From simple business websites to powerful custom platforms, we
             provide complete website solutions tailored to your goals
           </p>
@@ -74,14 +74,12 @@ export function Services() {
         {/*
           Row 1 open on load, matching the Figma's resting state.
 
-          The min-height reserves the tallest state so the section never grows
-          or shrinks as rows toggle — without it, opening a row pushes the whole
-          page down and closing one snaps it back.
-          Measured from the DOM: 8 collapsed rows at 96px = 768, plus one open
-          panel at 116px = 884. Only applied from md up; below that the panel
-          stacks to a different height and reserving would just waste space.
+          fixedHeight reserves the tallest panel so the section never grows or
+          shrinks as rows toggle. It measures at runtime rather than using a
+          hardcoded px value, which silently under-reserves as soon as the copy
+          or the viewport width changes how the body text wraps.
         */}
-        <Accordion defaultIndex={0} className="mt-20 md:min-h-[884px]">
+        <Accordion defaultIndex={0} fixedHeight className="mt-20">
           {services.map((service, index) => (
             <AccordionItem
               key={service.name}

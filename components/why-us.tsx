@@ -1,4 +1,4 @@
-import Image from "next/image";
+﻿import Image from "next/image";
 import { CaretDoubleRight, Sun } from "@phosphor-icons/react/ssr";
 
 import { SectionHeading, SectionLabel } from "@/components/section-label";
@@ -8,13 +8,13 @@ import { Reveal } from "@/components/ui/reveal";
  * Bento layout, measured off Frame 1 (cards span y 4195-4950):
  *
  *   col 1            col 2                    col 3
- *   ┌────────────┐   ┌────────────────────┐   ┌──────────────────┐
- *   │ star card  │   │ Clear Communication│   │ First Delivery   │
- *   ├────────────┤   ├────────────────────┤   │ + Launch In A Wk │
- *   │ One Stop   │   │ Responsive For All │   ├──────────────────┤
- *   └────────────┘   ├────────────────────┤   │ Start With 0.00$ │
- *                    │ Support After      │   └──────────────────┘
- *                    └────────────────────┘
+ *   â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”   â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”   â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+ *   â”‚ star card  â”‚   â”‚ Clear Communicationâ”‚   â”‚ First Delivery   â”‚
+ *   â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤   â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤   â”‚ + Launch In A Wk â”‚
+ *   â”‚ One Stop   â”‚   â”‚ Responsive For All â”‚   â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+ *   â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜   â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤   â”‚ Start With 0.00$ â”‚
+ *                    â”‚ Support After      â”‚   â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+ *                    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
  *
  * Columns are equal height; cards flex evenly inside, giving the 2 / 3 / 2
  * split. The illustrations are `Mask group` nodes in Figma — clipped by the
@@ -30,7 +30,7 @@ export function WhyUs() {
           <SectionHeading className="mx-auto mt-7 max-w-[740px] text-ink">
             Built for Small Businesses That Want Results
           </SectionHeading>
-          <p className="mx-auto mt-6 max-w-[780px] text-[17px] leading-7 text-ink-muted">
+          <p className="mx-auto mt-6 max-w-[780px] text-[18px] leading-8 text-ink-muted">
             We simplify the entire website process by bringing design,
             development, launch, and ongoing support together under one reliable
             team
@@ -42,7 +42,7 @@ export function WhyUs() {
           amount={0.15}
           className="mt-16 grid gap-5 md:h-[760px] md:grid-cols-3"
         >
-          {/* ── Column 1 ─────────────────────────────────── */}
+          {/* â”€â”€ Column 1 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
           <div className="flex flex-col gap-5">
             {/* 4x export of node 132:8124 (366x370). */}
             <article className="relative flex flex-1 flex-col justify-end overflow-hidden rounded-2xl bg-teal">
@@ -68,7 +68,7 @@ export function WhyUs() {
             </article>
           </div>
 
-          {/* ── Column 2 ─────────────────────────────────── */}
+          {/* â”€â”€ Column 2 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
           <div className="flex flex-col gap-5">
             {/* 4x export of node 135:8153 (364x242). */}
             <article className="relative flex-1 overflow-hidden rounded-2xl bg-cream">
@@ -123,7 +123,7 @@ export function WhyUs() {
             </article>
           </div>
 
-          {/* ── Column 3 ─────────────────────────────────── */}
+          {/* â”€â”€ Column 3 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
           <div className="flex flex-col gap-5">
             <article className="flex flex-1 flex-col overflow-hidden rounded-2xl bg-cream p-5">
               <h3 className="flex items-center gap-2 px-2 pt-2 text-[21px] font-semibold text-teal-deep">

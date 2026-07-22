@@ -50,9 +50,7 @@ export function HorizontalPan({
       const getDistance = () =>
         Math.max(0, track.scrollWidth - window.innerWidth + 48);
 
-      gsap.to(track, {
-        x: () => -getDistance(),
-        ease: "none",
+      const timeline = gsap.timeline({
         scrollTrigger: {
           trigger: wrap,
           start: "top top",
@@ -64,6 +62,8 @@ export function HorizontalPan({
           invalidateOnRefresh: true,
         },
       });
+
+      timeline.to(track, { x: () => -getDistance(), ease: "none" }, 0);
     }, wrap);
 
     /*
@@ -85,9 +85,15 @@ export function HorizontalPan({
     <div ref={wrapRef} className={`relative overflow-hidden ${className ?? ""}`}>
       <div className="flex min-h-[100dvh] flex-col justify-center py-20">
         {header}
+        {/*
+          The track starts one full viewport to the right, so every card begins
+          off-screen and arrives one at a time as the section is scrubbed. That
+          sequencing is what lets each card's curtain fire on its own — if they
+          all started on screen their reveals would trigger together.
+        */}
         <div
           ref={trackRef}
-          className={`mt-14 flex w-max px-6 ${gapClassName}`}
+          className={`mt-14 flex w-max pl-[88vw] pr-[12vw] ${gapClassName}`}
         >
           {children}
         </div>

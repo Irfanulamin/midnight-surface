@@ -25,9 +25,15 @@ export function SectionHeading({
   children: React.ReactNode;
   className?: string;
 }) {
+  /*
+   * Measured off the Frame 1 export rather than eyeballed: the two lines of
+   * "Businesses That Trust Our Work" have 48px cap heights (=> ~66px at Inter's
+   * 0.727 cap ratio) and their tops sit 74px apart (=> line-height 1.12).
+   * The previous 3.5rem cap was clamping this ~10px too small at 1440.
+   */
   return (
     <h2
-      className={`text-[clamp(2rem,4.6vw,3.5rem)] font-bold leading-[1.06] tracking-[-0.025em] ${className}`}
+      className={`text-[clamp(2.25rem,4.6vw,4.125rem)] font-bold leading-[1.12] tracking-[-0.025em] ${className}`}
     >
       {children}
     </h2>

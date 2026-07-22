@@ -1,8 +1,8 @@
-import Image from "next/image";
+﻿import Image from "next/image";
 
 import { SectionHeading, SectionLabel } from "@/components/section-label";
 import { HorizontalPan } from "@/components/ui/horizontal-pan";
-import { Reveal } from "@/components/ui/reveal";
+import { CurtainReveal, Reveal } from "@/components/ui/reveal";
 
 const projects = [
   {
@@ -38,7 +38,7 @@ export function OurWork() {
             <SectionHeading className="mt-7 max-w-[620px] text-ink">
               Websites That Deliver Real Results
             </SectionHeading>
-            <p className="mt-6 max-w-[640px] text-[17px] leading-7 text-ink-muted">
+            <p className="mt-6 max-w-[640px] text-[18px] leading-8 text-ink-muted">
               Every project is designed with one goal in mind—helping businesses
               attract more customers, generate leads, and grow online
             </p>
@@ -46,18 +46,26 @@ export function OurWork() {
         }
       >
         {projects.map((project, index) => (
-          <article key={index} className="lift w-[420px] shrink-0">
+          <article key={index} className="w-[420px] shrink-0">
             {/*
-              Natural aspect ratio, no object-cover — the shots are 1853x2023
-              and cropping to a fixed height was cutting the bottom off.
+              Each shot is covered by a teal panel that lifts away as the card
+              arrives, so the work is revealed rather than just appearing.
+              rounded-xl lives on the wrapper so the cover is clipped to the
+              same corners as the image beneath it.
             */}
-            <Image
-              src={project.src}
-              alt={project.title}
-              width={1853}
-              height={2023}
-              className="h-auto w-full rounded-xl"
-            />
+            <CurtainReveal className="rounded-xl" delay={0.05}>
+              {/*
+                Natural aspect ratio, no object-cover — the shots are 1853x2023
+                and cropping to a fixed height was cutting the bottom off.
+              */}
+              <Image
+                src={project.src}
+                alt={project.title}
+                width={1853}
+                height={2023}
+                className="h-auto w-full"
+              />
+            </CurtainReveal>
             <h3 className="mt-7 text-[26px] font-semibold tracking-[-0.01em] text-ink">
               {project.title}
             </h3>

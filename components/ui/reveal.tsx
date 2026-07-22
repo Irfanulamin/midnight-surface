@@ -93,6 +93,56 @@ export function RevealGroup({
   );
 }
 
+/*
+ * Curtain reveal.
+ *
+ * The child sits under a solid brand-colour panel. When the card enters the
+ * viewport the panel lifts away upward, uncovering the content from the bottom
+ * up — the wipe edge travels bottom -> top.
+ *
+ * scaleY from a top origin rather than translateY: the panel collapses into its
+ * own top edge, so it can never bleed over a neighbouring card the way a
+ * sliding panel would, and it stays a pure compositor transform.
+ */
+export function CurtainReveal({
+  children,
+  className,
+  delay = 0,
+  duration = 0.9,
+  /** Tailwind background utility for the cover. */
+  coverClassName = "bg-teal",
+}: {
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+  duration?: number;
+  coverClassName?: string;
+}) {
+  const reduce = useReducedMotion();
+
+  return (
+    <div className={`relative overflow-hidden ${className ?? ""}`}>
+      {children}
+      {!reduce ? (
+        <motion.div
+          aria-hidden
+          className={`pointer-events-none absolute inset-0 z-10 origin-top ${coverClassName}`}
+          initial={{ scaleY: 1 }}
+          whileInView={{ scaleY: 0 }}
+          /*
+           * amount 0.6 so a card only uncovers once it is properly on screen.
+           * A low threshold fires while the card is still half off the right
+           * edge, which makes several appear to reveal at once instead of in
+           * sequence.
+           */
+          viewport={{ once: true, amount: 0.6 }}
+          transition={{ duration, delay, ease: EASE }}
+        />
+      ) : null}
+    </div>
+  );
+}
+
 export function RevealItem({
   children,
   className,

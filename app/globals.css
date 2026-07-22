@@ -10,6 +10,10 @@
 @theme {
   --color-surface: #fbf9f5;
   --color-cream: #f2ede1;
+  /* Step cards use a lighter cream than the bento cards — sampled, not assumed. */
+  --color-cream-light: #f6f2e9;
+  /* 2px rule above the How It Works carousel. */
+  --color-rule: #e8e7e5;
   --color-ink: #101010;
   --color-ink-muted: #6b6b6b;
 

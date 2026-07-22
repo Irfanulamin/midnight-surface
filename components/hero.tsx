@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 import { GrowthChart } from "@/components/growth-chart";
 import { RevealGroup, RevealItem } from "@/components/ui/reveal";
@@ -23,13 +23,14 @@ export function Hero() {
           No text-balance — it would rebalance those lines away.
         */}
         <RevealItem>
-          <h1 className="mx-auto max-w-[830px] text-[clamp(2.75rem,7vw,5.5rem)] font-bold leading-[0.98] tracking-[-0.03em] text-ink">
+          {/* Line tops sit 92.5px apart in the Figma at 88px type => 1.05. */}
+          <h1 className="mx-auto max-w-[830px] text-[clamp(2.75rem,7vw,5.5rem)] font-bold leading-[1.05] tracking-[-0.03em] text-ink">
             Everything Your Business Needs in One Website
           </h1>
         </RevealItem>
 
         <RevealItem>
-          <p className="mx-auto mt-8 max-w-[560px] text-balance text-[17px] leading-7 text-ink-muted">
+          <p className="mx-auto mt-8 max-w-[560px] text-balance text-[18px] leading-8 text-ink-muted">
             Professional websites for small businesses—designed, developed,
             launched, and supported without breaking your bank.
           </p>

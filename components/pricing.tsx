@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { CheckSquare } from "@phosphor-icons/react/ssr";
 
 import { SectionHeading, SectionLabel } from "@/components/section-label";
@@ -37,7 +37,7 @@ export function Pricing() {
           <SectionHeading className="mx-auto mt-7 max-w-[860px] text-ink">
             Affordable Website Packages for Every Business
           </SectionHeading>
-          <p className="mx-auto mt-6 max-w-[820px] text-[17px] leading-7 text-ink-muted">
+          <p className="mx-auto mt-6 max-w-[820px] text-[18px] leading-8 text-ink-muted">
             Choose the package that fits your business today, with the
             flexibility to scale as your needs grow
           </p>
