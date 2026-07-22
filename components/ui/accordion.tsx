@@ -9,19 +9,17 @@ import {
   useRef,
   useState,
 } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { useReducedMotion } from "motion/react";
 
 /*
  * Single-open accordion primitive.
  *
- * Owns the state, the ARIA wiring and the height animation; styling is left
+ * Owns the state, the ARIA wiring and the open/close animation; styling is left
  * entirely to the caller, because the two places this is used look nothing
  * alike (borderless rows on teal vs. separated cards on cream). Trying to
  * express both through one set of style props would have been worse than
  * passing the visuals in.
  */
-
-const EASE = [0.22, 1, 0.36, 1] as const;
 
 type AccordionContextValue = {
   openIndex: number | null;
