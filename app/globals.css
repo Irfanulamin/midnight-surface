@@ -77,6 +77,32 @@ body {
   }
 }
 
+/*
+ * Shared hover physics.
+ *
+ * One curve everywhere — cubic-bezier(0.16, 1, 0.3, 1) — so every interactive
+ * surface decelerates identically and the page feels like one system. Only
+ * transform and box-shadow move; nothing here triggers layout.
+ */
+.lift {
+  transition:
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 22px 44px -24px rgb(0 0 0 / 0.3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lift,
+  .lift:hover {
+    transition: none;
+    transform: none;
+  }
+}
+
 /* Dot grid that sits behind the hero. */
 .bg-dotgrid {
   background-image: radial-gradient(

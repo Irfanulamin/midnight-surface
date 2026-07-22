@@ -78,7 +78,7 @@ export function Process() {
           return (
             <article
               key={step.n}
-              className={`flex h-[500px] w-[340px] shrink-0 flex-col justify-between rounded-2xl p-8 ${
+              className={`lift flex h-[500px] w-[340px] shrink-0 flex-col justify-between rounded-2xl p-8 ${
                 active ? "bg-yellow" : "bg-cream"
               }`}
             >

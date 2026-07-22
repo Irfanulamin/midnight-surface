@@ -46,7 +46,7 @@ export function OurWork() {
         }
       >
         {projects.map((project, index) => (
-          <article key={index} className="w-[420px] shrink-0">
+          <article key={index} className="lift w-[420px] shrink-0">
             {/*
               Natural aspect ratio, no object-cover — the shots are 1853x2023
               and cropping to a fixed height was cutting the bottom off.

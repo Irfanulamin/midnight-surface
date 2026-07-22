@@ -2,6 +2,7 @@ import { CaretDown, CaretUp } from "@phosphor-icons/react/ssr";
 
 import { SectionHeading, SectionLabel } from "@/components/section-label";
 import { Accordion, AccordionItem } from "@/components/ui/accordion";
+import { Reveal } from "@/components/ui/reveal";
 
 /*
  * The Figma writes the same placeholder question five times and only gives the
@@ -26,7 +27,7 @@ export function Faq() {
   return (
     <section className="px-6 py-28">
       <div className="mx-auto max-w-[1160px]">
-        <div className="text-center">
+        <Reveal className="text-center">
           <SectionLabel>Common Questions</SectionLabel>
           <SectionHeading className="mt-7 text-ink">
             Everything You Need to Know
@@ -35,7 +36,7 @@ export function Faq() {
             Have questions? We&apos;ve answered the ones we hear most often to
             help you make an informed decision with confidence.
           </p>
-        </div>
+        </Reveal>
 
         {/* Row 2 open on load, matching the Figma's resting state. */}
         <Accordion

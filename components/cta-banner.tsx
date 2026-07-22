@@ -1,10 +1,15 @@
 import Link from "next/link";
 import { ArrowUpRight, CheckCircle } from "@phosphor-icons/react/ssr";
 
+import { Reveal } from "@/components/ui/reveal";
+
 export function CtaBanner() {
   return (
     <section className="px-6 pb-28">
-      <div className="mx-auto max-w-[1160px] rounded-2xl bg-teal px-14 py-20 text-white">
+      <Reveal
+        amount={0.2}
+        className="mx-auto max-w-[1160px] rounded-2xl bg-teal px-14 py-20 text-white"
+      >
         <div className="flex flex-col gap-12 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-[19px] text-white/80">
@@ -40,14 +45,19 @@ export function CtaBanner() {
             </p>
             <Link
               href="/contact"
-              className="mt-7 inline-flex items-center gap-2 rounded-pill bg-yellow px-8 py-4 text-[16px] font-medium text-ink transition-colors hover:bg-yellow-strong"
+              className="group mt-7 inline-flex items-center gap-2 rounded-pill bg-yellow px-8 py-4 text-[16px] font-medium text-ink transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 hover:bg-yellow-strong hover:shadow-[0_14px_30px_-12px_rgb(0_0_0/0.45)] active:scale-[0.98]"
             >
               Contact Us
-              <ArrowUpRight size={18} weight="bold" aria-hidden />
+              <ArrowUpRight
+                size={18}
+                weight="bold"
+                aria-hidden
+                className="transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              />
             </Link>
           </div>
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }

@@ -32,7 +32,7 @@ export function TrustedBy() {
         {clients.map((client) => (
           <div
             key={client.src}
-            className="grid h-[248px] w-[250px] shrink-0 place-items-center rounded-2xl bg-cream p-12"
+            className="lift grid h-[248px] w-[250px] shrink-0 place-items-center rounded-2xl bg-cream p-12"
           >
             <Image
               src={client.src}
