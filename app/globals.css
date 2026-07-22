@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+/*
+ * Midnight Surface design tokens.
+ *
+ * Every colour below was sampled pixel-wise from the 1440 x 18113 PNG export
+ * of Frame 1, not eyeballed. --color-surface additionally matches the value
+ * Figma reports for the frame fill (#FBF9F5).
+ */
+@theme {
+  --color-surface: #fbf9f5;
+  --color-cream: #f2ede1;
+  --color-ink: #101010;
+  --color-ink-muted: #6b6b6b;
+
+  --color-yellow: #ffe273;
+  --color-yellow-strong: #f5d24f;
+
+  --color-coral: #fd7c5a;
+  --color-teal: #1c5a55;
+  --color-teal-deep: #034843;
+
+  --radius-card: 1.75rem;
+  --radius-pill: 9999px;
+
+  /*
+   * Fallback stack only. Tailwind v4 resolves @theme at parse time, so the
+   * runtime variable next/font generates cannot be referenced here — the real
+   * family is applied on html below.
+   */
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
+}
+
+/*
+ * next/font/local emits a hashed family name into --font-inter-display, which
+ * only exists at runtime. Applying it in a normal rule rather than inside
+ * @theme is what makes it actually resolve.
+ */
+html {
+  font-family: var(--font-inter-display), var(--font-sans);
+}
+
+body {
+  background: var(--color-surface);
+  color: var(--color-ink);
+}
+
+/*
+ * Infinite marquee.
+ *
+ * The track renders its content twice and translates by exactly -50%, so the
+ * second copy lands where the first began and the loop is seamless. Driven by
+ * CSS rather than JS: it is a single compositor-thread transform that keeps
+ * running without main-thread work, and it can be paused declaratively.
+ */
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  animation: marquee-scroll var(--marquee-duration, 40s) linear infinite;
+  will-change: transform;
+}
+
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}
+
+/* Dot grid that sits behind the hero. */
+.bg-dotgrid {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgb(0 0 0 / 0.07) 1px,
+    transparent 0
+  );
+  background-size: 22px 22px;
+}

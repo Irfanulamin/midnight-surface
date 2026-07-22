@@ -1,0 +1,145 @@
+import Link from "next/link";
+import { CheckSquare } from "@phosphor-icons/react/ssr";
+
+import { SectionHeading, SectionLabel } from "@/components/section-label";
+import { Reveal } from "@/components/ui/reveal";
+
+const landing = [
+  "1 Custom Landing Page",
+  "Responsive Development",
+  "UI/UX Design",
+  "Contact Form",
+  "Basic SEO Setup",
+  "Speed Optimization",
+  "Speed Optimization",
+  "2 Rounds of Revisions",
+  "Delivery in 5–7 Days",
+];
+
+const complete = [
+  "Up to 5-10 Pages",
+  "Responsive Development",
+  "UI/UX Design",
+  "Contact Form",
+  "Basic SEO Setup",
+  "Speed Optimization",
+  "Speed Optimization",
+  "2 Rounds of Revisions",
+  "Delivery in 5–7 Days",
+];
+
+export function Pricing() {
+  return (
+    <section className="px-6 py-28">
+      <div className="mx-auto max-w-[1160px]">
+        <Reveal className="text-center">
+          <SectionLabel>Pricing</SectionLabel>
+          <SectionHeading className="mx-auto mt-7 max-w-[860px] text-ink">
+            Affordable Website Packages for Every Business
+          </SectionHeading>
+          <p className="mx-auto mt-6 max-w-[820px] text-[17px] leading-7 text-ink-muted">
+            Choose the package that fits your business today, with the
+            flexibility to scale as your needs grow
+          </p>
+        </Reveal>
+
+        <Reveal delay={0.08} className="mt-14 grid gap-6 md:grid-cols-2">
+          <article className="relative rounded-2xl bg-cream p-10">
+            <span className="absolute -top-3 right-14 -rotate-6 rounded-pill bg-coral px-5 py-2 text-[13px] uppercase tracking-[0.06em] text-white">
+              Popular
+            </span>
+            <h3 className="text-[28px] font-semibold text-teal-deep">
+              Landing Page
+            </h3>
+            <p className="mt-3 text-[15px] text-ink-muted">
+              Perfect for launching a product, service, or campaign.
+            </p>
+            <p className="mt-8 flex items-baseline gap-3">
+              <span className="text-[56px] font-bold leading-none text-ink">
+                399$
+              </span>
+              <span className="text-[16px] italic text-ink-muted">Onetime</span>
+            </p>
+            <Link
+              href="/contact"
+              className="mt-8 block rounded-pill bg-yellow py-4 text-center text-[16px] font-medium text-ink transition-colors hover:bg-yellow-strong"
+            >
+              Get Started
+            </Link>
+            <p className="mt-8 border-t border-ink/10 pt-7 text-[15px] text-ink-muted">
+              What&apos;s Included:
+            </p>
+            <ul className="mt-5 space-y-4">
+              {landing.map((item, i) => (
+                <li key={i} className="flex items-center gap-3 text-[15px]">
+                  <CheckSquare
+                    size={20}
+                    weight="fill"
+                    aria-hidden
+                    className="shrink-0 text-teal"
+                  />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </article>
+
+          <article className="rounded-2xl bg-teal-deep p-10 text-white">
+            <h3 className="text-[28px] font-semibold">Complete Website</h3>
+            <p className="mt-3 text-[15px] text-white/65">
+              Perfect for launching a product, service, or campaign.
+            </p>
+            <p className="mt-8 flex items-baseline gap-3">
+              <span className="text-[56px] font-bold leading-none">699$</span>
+              <span className="text-[16px] italic text-white/65">Onetime</span>
+            </p>
+            <Link
+              href="/contact"
+              className="mt-8 block rounded-pill bg-yellow py-4 text-center text-[16px] font-medium text-ink transition-colors hover:bg-yellow-strong"
+            >
+              Get Started
+            </Link>
+            <p className="mt-8 border-t border-white/20 pt-7 text-[15px] text-white/65">
+              What&apos;s Included:
+            </p>
+            <ul className="mt-5 space-y-4">
+              {complete.map((item, i) => (
+                <li key={i} className="flex items-center gap-3 text-[15px]">
+                  <CheckSquare
+                    size={20}
+                    weight="fill"
+                    aria-hidden
+                    className="shrink-0 text-white/85"
+                  />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </article>
+        </Reveal>
+
+        <Reveal
+          delay={0.14}
+          className="mt-6 flex flex-col gap-6 rounded-2xl border border-ink/10 bg-surface p-10 md:flex-row md:items-center md:justify-between"
+        >
+          <div>
+            <h3 className="text-[26px] font-semibold text-ink">
+              Custom Solution
+            </h3>
+            <p className="mt-3 max-w-[700px] text-[15px] leading-7 text-ink-muted">
+              Every business is different. If your project requires custom
+              features, advanced integrations, or a unique workflow, we&apos;ll
+              create a tailored solution designed specifically for your goals.
+            </p>
+          </div>
+          <Link
+            href="/contact"
+            className="shrink-0 rounded-pill bg-yellow px-7 py-4 text-[15px] font-medium text-ink transition-colors hover:bg-yellow-strong"
+          >
+            Request a Custom Quote
+          </Link>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
