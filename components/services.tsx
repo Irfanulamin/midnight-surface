@@ -112,16 +112,21 @@ export function Services() {
                     </span>
 
                     {/*
-                      One glyph that rotates a quarter turn, rather than two
-                      glyphs cross-fading. The rotation reads as the row itself
-                      turning open, and it is a single compositor transform.
-                      Driven off the trigger's aria-expanded, since the
-                      accordion's open state cannot be passed in.
+                      One glyph doing a half turn, rather than two glyphs
+                      cross-fading. 180deg lands ArrowUpRight exactly on the
+                      ArrowDownLeft the Figma draws for the open state, so the
+                      design's two icons become one that travels between them.
+
+                      The transitioned property is `rotate`, NOT `transform`.
+                      Tailwind v4 compiles rotate-* to the standalone `rotate`
+                      property so transforms can compose, which means
+                      transition-[transform] never sees it and the icon snaps
+                      round with no animation at all.
                     */}
                     <ArrowUpRight
                       size={26}
                       aria-hidden
-                      className="size-[22px] shrink-0 text-white transition-[transform,color] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-aria-expanded:rotate-90 group-aria-expanded:text-yellow sm:size-[26px]"
+                      className="size-[22px] shrink-0 text-white transition-[rotate,color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-aria-expanded:rotate-180 group-aria-expanded:text-yellow sm:size-[26px]"
                     />
                   </>
                 }
