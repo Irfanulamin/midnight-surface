@@ -1,4 +1,4 @@
-import { ArrowDownLeft, ArrowUpRight } from "@phosphor-icons/react/ssr";
+import { ArrowUpRight } from "@phosphor-icons/react/ssr";
 
 import { SectionIntro } from "@/components/section-intro";
 import { Accordion, AccordionItem } from "@/components/ui/accordion";
@@ -112,24 +112,17 @@ export function Services() {
                     </span>
 
                     {/*
-                      The design uses two different glyphs for the two states,
-                      not one glyph at two angles — so these cross-fade rather
-                      than rotate. Both are rendered and toggled by the
-                      trigger's aria-expanded, since open state cannot be
-                      passed in.
+                      One glyph that rotates a quarter turn, rather than two
+                      glyphs cross-fading. The rotation reads as the row itself
+                      turning open, and it is a single compositor transform.
+                      Driven off the trigger's aria-expanded, since the
+                      accordion's open state cannot be passed in.
                     */}
-                    <span className="relative block size-[22px] shrink-0 sm:size-[26px]">
-                      <ArrowUpRight
-                        size={26}
-                        aria-hidden
-                        className="absolute inset-0 size-full text-white opacity-100 transition-opacity duration-300 group-aria-expanded:opacity-0"
-                      />
-                      <ArrowDownLeft
-                        size={26}
-                        aria-hidden
-                        className="absolute inset-0 size-full text-yellow opacity-0 transition-opacity duration-300 group-aria-expanded:opacity-100"
-                      />
-                    </span>
+                    <ArrowUpRight
+                      size={26}
+                      aria-hidden
+                      className="size-[22px] shrink-0 text-white transition-[transform,color] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-aria-expanded:rotate-90 group-aria-expanded:text-yellow sm:size-[26px]"
+                    />
                   </>
                 }
               >
