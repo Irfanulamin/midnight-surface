@@ -7,8 +7,9 @@ import {
   TrendUp,
 } from "@phosphor-icons/react/ssr";
 
+import { ProcessTrack } from "@/components/process-track";
 import { SectionIntro } from "@/components/section-intro";
-import { Marquee } from "@/components/ui/marquee";
+import { HorizontalPan } from "@/components/ui/horizontal-pan";
 
 /* Six steps, read off components S1-S6 in the Figma. */
 const steps = [
@@ -52,74 +53,74 @@ const steps = [
 
 export function Process() {
   return (
-    <section className="py-16 sm:py-20 md:py-28">
-      <SectionIntro
-        className="mx-auto max-w-[1160px] px-6"
-        label="How It Works"
-        heading="A Simple Process From Idea to Launch"
-        headingClassName="mx-auto mt-7 max-w-[820px] text-ink"
-        body={
+    <section id="process" className="scroll-mt-24">
+      {/*
+        Same pinned scrub as Our Work, for the same reason: the six steps are a
+        sequence, and a marquee showed them as an undifferentiated loop the eye
+        slides off. Pinned, each step arrives on its own and uncovers itself, so
+        the section reads in the order the process actually happens.
+      */}
+      <HorizontalPan
+        /*
+          Enough trailing room for step 06 to reach the middle of the screen.
+          At the default 12vw the track stops with the last card pinned near the
+          right edge, so it never crossed the centre band and never lit up.
+
+          38vw puts its centre at ~53% of the viewport on the final frame, which
+          is inside the band. Going further (62vw was tried) just parks the card
+          left of centre and leaves a screen of empty track scrolling past.
+        */
+        trailClassName="md:pr-[38vw]"
+        header={
           <>
-            We&apos;ve created a clear, collaborative process that keeps your
-            project moving smoothly from the first conversation to a successful
-            launch
+            <SectionIntro
+              className="mx-auto max-w-[1160px] px-6"
+              label="How It Works"
+              heading="A Simple Process From Idea to Launch"
+              headingClassName="mx-auto mt-7 max-w-[820px] text-ink"
+              body={
+                <>
+                  We&apos;ve created a clear, collaborative process that keeps
+                  your project moving smoothly from the first conversation to a
+                  successful launch
+                </>
+              }
+              bodyClassName="mx-auto mt-6 max-w-[790px] text-ink-muted"
+            />
+
+            {/* 2px rule above the carousel, sampled at #e8e7e5 in the Figma. */}
+            <div className="mt-8 h-0.5 w-full bg-rule sm:mt-10" />
           </>
         }
-        bodyClassName="mx-auto mt-6 max-w-[790px] text-ink-muted"
-      />
+      >
+        {/*
+          The yellow in the Figma is the card's HOVER variant, not a highlight
+          on step 03 — 03 was just the card the state was demonstrated on. It is
+          driven by scroll position now rather than by the cursor, so the
+          sequence plays itself as the section scrubs; see <ProcessTrack>.
 
-      {/* 2px rule above the carousel, sampled at #e8e7e5 in the Figma. */}
-      <div className="mt-10 h-0.5 w-full bg-rule sm:mt-16" />
-
-      {/*
-        Scrolls continuously; pauses on hover so a card can be read and hovered.
-        py-10 gives the hover lift somewhere to go — the marquee clips
-        overflow, so without it the raised card's top edge gets cut off.
-      */}
-      <Marquee duration={55} gapClassName="pr-4 sm:pr-5" className="py-8 sm:py-10">
-        {steps.map((step) => (
-          /*
-            Every card rests in the cream state. The yellow in the Figma is the
-            component's HOVER variant, not a highlight on step 03 — 03 was just
-            the card the state was demonstrated on. So: lift and turn yellow on
-            hover, nothing permanently singled out.
-
-            No border and no shadow: pixel-sampling the card's top edge showed
-            #fbf9f5 -> #f6f2e9 with no intermediate line at all.
-          */
-          <article
-            key={step.n}
-            className="group flex h-[400px] w-[270px] shrink-0 flex-col justify-between rounded-2xl bg-cream-light p-6 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-4 hover:bg-yellow sm:h-[460px] sm:w-[310px] sm:p-7 md:h-[500px] md:w-[340px] md:p-8"
-          >
-            <div>
-              <p className="text-[13px] tracking-[0.06em] text-teal/60 transition-colors duration-500 group-hover:text-teal sm:text-[15px]">
-                /STEPS
-              </p>
-              <p className="mt-3 text-[56px] font-bold leading-none text-teal/40 transition-colors duration-500 group-hover:text-teal-deep sm:mt-4 sm:text-[66px] md:text-[76px]">
-                {step.n}
-              </p>
-              <h3 className="mt-7 text-[20px] font-semibold text-teal/70 transition-colors duration-500 group-hover:text-teal-deep sm:mt-9 sm:text-[22px] md:mt-10 md:text-[24px]">
-                {step.title}
-              </h3>
-              <p className="mt-3 max-w-[280px] text-[15px] leading-7 text-teal/50 transition-colors duration-500 group-hover:text-teal-deep/80 sm:mt-4 sm:text-[16px]">
-                {step.body}
-              </p>
-            </div>
-
-            {/*
-              Phosphor writes size onto the SVG's width/height attributes; the
-              size-* utilities are CSS and win, which is how this scales down
-              without a second icon.
-            */}
-            <step.Icon
-              size={84}
-              weight="thin"
-              aria-hidden
-              className="size-[60px] self-end text-teal/40 transition-colors duration-500 group-hover:text-teal-deep sm:size-[72px] md:size-[84px]"
-            />
-          </article>
-        ))}
-      </Marquee>
+          Icons are rendered here and passed down as elements because
+          ProcessTrack is a Client Component and a component reference cannot
+          cross that boundary. Phosphor writes size onto the SVG's width/height
+          attributes, so the size-* utilities (CSS) win and scale it without a
+          second icon.
+        */}
+        <ProcessTrack
+          steps={steps.map((step) => ({
+            n: step.n,
+            title: step.title,
+            body: step.body,
+            icon: (
+              <step.Icon
+                size={84}
+                weight="thin"
+                aria-hidden
+                className="size-[56px] sm:size-[64px] md:size-[72px]"
+              />
+            ),
+          }))}
+        />
+      </HorizontalPan>
     </section>
   );
 }

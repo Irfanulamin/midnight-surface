@@ -30,7 +30,10 @@ const complete = [
 
 export function Pricing() {
   return (
-    <section className="px-6 py-16 sm:py-20 md:py-28">
+    <section
+      id="pricing"
+      className="scroll-mt-24 px-6 py-16 sm:py-20 md:py-28"
+    >
       <div className="mx-auto max-w-[1160px]">
         <SectionIntro
           label="Pricing"

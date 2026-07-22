@@ -16,6 +16,10 @@ pnpm exec tsc --noEmit   # typecheck — the fastest correctness gate; run this 
 
 There is no test framework in this repo. `tsc --noEmit` plus a visual check in the browser is the verification loop.
 
+`pnpm lint` currently reports one pre-existing error — `react-hooks/set-state-in-effect` in `growth-chart.tsx`, where the reduced-motion branch sets state synchronously. Everything else is clean; don't let that one mask a new one.
+
+Note `next lint` was removed in Next 16 — the script is plain `eslint`.
+
 ## What this is
 
 A single-page marketing site for "Midnight Surface", built as a **pixel-faithful implementation of a Figma design** (`Frame 1`, a 1440 × 18113 export). Next.js 16 App Router, React 19, Tailwind CSS v4, TypeScript strict.
@@ -36,29 +40,42 @@ Two constraints that are easy to break:
 
 `.lift` is the shared hover physics — `cubic-bezier(0.16, 1, 0.3, 1)`, transform + box-shadow only. Reuse it instead of writing per-component hover transitions so the page decelerates as one system.
 
-### Motion: Motion for entry, GSAP only for pin/scrub
+### Motion: Lenis for scroll, Motion for entry, GSAP only for pin/scrub
 
-The split is deliberate and documented in the primitives:
+The split is deliberate and documented in each primitive:
+
+- **`components/ui/smooth-scroll.tsx`** (Lenis) — mounted once in `app/layout.tsx`. It eases the real window scroll position, so everything downstream (ScrollTrigger, `useScroll`, `whileInView`) inherits the smoothing without knowing Lenis exists. Three bits of wiring are load-bearing and explained in the file: `autoRaf: false` + `gsap.ticker` (one frame, not two loops), `lenis.on("scroll", ScrollTrigger.update)`, and `lagSmoothing(0)`. Lenis' stylesheet is inlined into `globals.css` — its `height: auto` on html/body is what gives it something to scroll.
 - **`components/ui/reveal.tsx`** (Motion / `whileInView`) — `Reveal`, `RevealGroup` + `RevealItem` (variant-driven stagger; children read the parent's variants so inserting a card cannot desync the sequence), and `CurtainReveal` (a brand-colour panel that collapses via `scaleY` from a top origin).
-- **`components/ui/horizontal-pan.tsx`** (GSAP + ScrollTrigger) — the only place GSAP is used, because it needs real pinning and scrubbing. `start: "top top"` and `end: "+=<track distance>"` are load-bearing; so is the `ScrollTrigger.refresh()` after images settle.
+- **`components/ui/text-reveal.tsx`** — `TextReveal` (per-word mask rise; takes a plain **string** so it can split it, and sets `aria-label` so the heading is announced as one phrase) and `MaskReveal` (single mask, for a line containing markup). The `pb-[0.14em] / mb-[-0.14em]` pair on the mask is what stops `overflow-hidden` clipping descenders.
+- **`components/ui/horizontal-pan.tsx`** (GSAP + ScrollTrigger) — the only place GSAP is used, because it needs real pinning and scrubbing. Set up through `gsap.matchMedia("(min-width: 768px) and (prefers-reduced-motion: no-preference)")`, so the pin simply does not exist on phones and reverts cleanly on resize. `start: "top top"` and `end: "+=<track distance>"` are load-bearing, as is the `ScrollTrigger.refresh()` after images settle.
 - **`components/ui/marquee.tsx`** — pure CSS, ships no JS. Item spacing must stay `padding-right` on each item, never flex `gap`, or the `-50%` loop seam jumps.
+- **`parallax.tsx`**, **`magnetic.tsx`**, **`scroll-progress.tsx`** — scroll-linked drift, pointer attraction (gated on `(pointer: fine)`), and the top progress rule.
 
 Every animated primitive checks `useReducedMotion()` (or a `prefers-reduced-motion` media query in CSS) and degrades to static. Keep that when adding motion.
 
-Animate transform and opacity only. For scroll position use `useScroll` + `useMotionValueEvent` (as `site-header.tsx` does), not a raw `scroll` listener.
+Animate transform and opacity only. For scroll position use `useScroll` + `useMotionValueEvent` (as `site-header.tsx` does), not a raw `scroll` listener. `useMediaQuery` (`components/ui/use-media-query.ts`) wraps `matchMedia` in `useSyncExternalStore` — use it rather than reading `matchMedia` into state from an effect, which the `react-hooks/set-state-in-effect` rule rejects.
 
 ### Server vs client components
 
-Default is Server Component. Only five files are `"use client"`: `growth-chart`, `site-header`, `ui/accordion`, `ui/horizontal-pan`, `ui/reveal`. Section components stay server-side and import client primitives — keep it that way.
+Default is Server Component; section components stay server-side and import client primitives. Keep it that way — the `"use client"` files are the primitives plus `growth-chart` and `site-header`.
 
 Icons come from `@phosphor-icons/react/ssr` (the `/ssr` entrypoint), which is what lets server sections render icons without a client boundary. Import from `/ssr` in server components.
 
 ### Shared components
 
-- `components/section-label.tsx` — `SectionLabel` (the pill eyebrow, `teal` / `onTeal` tones) and `SectionHeading` (the measured `h2` clamp). Use these rather than restating the type ramp.
-- `components/ui/accordion.tsx` — headless single-open accordion owning state, ARIA and height animation; styling is entirely the caller's (used by both `faq.tsx` on cream cards and `services.tsx` on teal rows, which look nothing alike).
-- Sections converge on `px-6 py-28` with an inner `mx-auto max-w-[1160px]`.
-- `components/growth-chart.tsx` — hand-built SVG with a scripted beat order (frame in → curve draws → marker arrives → green fill rises). The green wash is gated behind arrival on purpose; do not make it fill progressively.
+- `components/section-intro.tsx` — the label / heading / body trio that opens nearly every section, and the one place the entrance choreography lives (pill → heading assembling word by word → body catching up). Sections pass only what differs: the measured `max-w`, the colour, `align`. **The body type ramp is set here**, so callers pass width and colour only.
+- `components/section-label.tsx` — `SectionLabel` (the pill eyebrow, `teal` / `onTeal`) and `sectionHeadingClass`, exported as a class string rather than a component because `SectionIntro` renders the `h2` through `TextReveal`, which must own the element to split it.
+- `components/ui/accordion.tsx` — headless single-open accordion owning state and ARIA; styling is entirely the caller's (used by `faq.tsx` on cream cards and `services.tsx` on teal rows, which look nothing alike). The panel opens by transitioning `grid-template-rows: 0fr → 1fr`, **not** to a measured pixel height — the old measured-height version silently clipped content whose height it had guessed wrong, and `min-h-0` on the inner div is what lets it close. The ResizeObserver now only feeds the optional `fixedHeight` reserve.
+- `components/growth-chart.tsx` — hand-built SVG with a scripted beat order (frame in → curve draws → marker arrives → green fill rises). The green wash is gated behind arrival on purpose; do not make it fill progressively. Because the whole thing is one 932-unit viewBox, its type is scaled by `COMPACT_TYPE_SCALE` below `sm` — geometry stays fixed, only the labels grow, and the callout pill is sized from the same factor so the box and its text grow together.
+
+### Responsive
+
+The design was drawn at 1440. Breakpoints in use are Tailwind defaults; two are not obvious:
+
+- **Nav collapses to a menu below `lg`, not `md`.** At 768 the five links plus the wordmark and the CTA do not fit on one line — they wrapped and ran through the logo. Same reason the service panel only puts its tag list beside the paragraph at `lg`.
+- **`md` is where the design's desktop layout starts**: the Our Work pin, the 3-column bento (`md:h-[760px]`), and the pricing grid. Below `md` the bento columns stack, and cards whose illustration is absolutely positioned carry an explicit `min-h-*` that is dropped again at `md` — without a fixed column height, `flex-1` has nothing to divide and those cards collapse to their heading.
+
+Sections use `px-6 py-16 sm:py-20 md:py-28` (the design's `py-28` only at `md`). Custom hover CSS in `globals.css` is wrapped in `@media (hover: hover)` so it cannot latch on touch; Tailwind's own `hover:` variant already does this.
 
 ### Assets
 

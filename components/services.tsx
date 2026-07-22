@@ -58,7 +58,10 @@ const services = [
 
 export function Services() {
   return (
-    <section className="bg-teal px-6 py-16 text-white sm:py-20 md:py-28">
+    <section
+      id="services"
+      className="scroll-mt-24 bg-teal px-6 py-16 text-white sm:py-20 md:py-28"
+    >
       <div className="mx-auto max-w-[1160px]">
         <SectionIntro
           label="Our Services"

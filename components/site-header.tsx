@@ -11,13 +11,20 @@ import {
 } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
+/*
+ * In-page anchors, not routes — this is a one-page site and those routes do not
+ * exist. Rendered as plain <a>, deliberately: next/link intercepts the click and
+ * runs its own scroll restoration for a same-page hash, which fights Lenis and
+ * produces a jump followed by a smooth correction. A bare anchor lets Lenis own
+ * the scroll (see `anchors` in <SmoothScroll>).
+ */
 const navLinks = [
-  { label: "Home", href: "/" },
-  { label: "Our Services", href: "/services" },
-  { label: "Our Work", href: "/work" },
-  { label: "Pricing", href: "/pricing" },
+  { label: "Home", href: "#top" },
+  { label: "Our Services", href: "#services" },
+  { label: "Our Work", href: "#work" },
+  { label: "Pricing", href: "#pricing" },
   // Figma reads "Success Stores" — treating that as a typo for "Stories".
-  { label: "Success Stories", href: "/success-stories" },
+  { label: "Success Stories", href: "#success-stories" },
 ];
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -110,7 +117,7 @@ export function SiteHeader() {
         <ul className="hidden items-center gap-7 lg:flex">
           {navLinks.map((link) => (
             <li key={link.href}>
-              <Link
+              <a
                 href={link.href}
                 className="group relative block py-1 text-[15px] text-ink/80 transition-colors duration-300 hover:text-ink"
               >
@@ -123,7 +130,7 @@ export function SiteHeader() {
                   aria-hidden
                   className="absolute inset-x-0 -bottom-0.5 h-px origin-left scale-x-0 bg-ink transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100"
                 />
-              </Link>
+              </a>
             </li>
           ))}
         </ul>
@@ -189,13 +196,13 @@ export function SiteHeader() {
             <ul>
               {navLinks.map((link) => (
                 <li key={link.href}>
-                  <Link
+                  <a
                     href={link.href}
                     onClick={() => setMenuOpen(false)}
                     className="block rounded-xl px-4 py-3.5 text-[16px] text-ink/85 transition-colors duration-200 hover:bg-cream hover:text-ink"
                   >
                     {link.label}
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ul>

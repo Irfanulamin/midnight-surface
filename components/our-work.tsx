@@ -29,7 +29,7 @@ const projects = [
 
 export function OurWork() {
   return (
-    <section>
+    <section id="work" className="scroll-mt-24">
       <HorizontalPan
         header={
           /* Left-aligned in the design, unlike its sibling sections. */

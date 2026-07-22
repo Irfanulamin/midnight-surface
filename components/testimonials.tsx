@@ -6,7 +6,10 @@ import { RevealGroup, RevealItem } from "@/components/ui/reveal";
 
 export function Testimonials() {
   return (
-    <section className="relative overflow-hidden bg-cream px-6 py-16 sm:py-20 md:py-28">
+    <section
+      id="success-stories"
+      className="relative scroll-mt-24 overflow-hidden bg-cream px-6 py-16 sm:py-20 md:py-28"
+    >
       <div className="relative mx-auto max-w-[1160px]">
         <SectionIntro
           label="Success Stories"

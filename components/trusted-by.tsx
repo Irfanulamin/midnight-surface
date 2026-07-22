@@ -34,7 +34,9 @@ export function TrustedBy() {
         {clients.map((client) => (
           <div
             key={client.src}
-            className="lift grid h-[168px] w-[170px] shrink-0 place-items-center rounded-2xl bg-cream p-8 sm:h-[248px] sm:w-[250px] sm:p-12"
+            /* No hover treatment — these are client marks scrolling past, not
+               things to interact with. */
+            className="grid h-[168px] w-[170px] shrink-0 place-items-center rounded-2xl bg-cream p-8 sm:h-[248px] sm:w-[250px] sm:p-12"
           >
             <Image
               src={client.src}

@@ -130,19 +130,37 @@ export function MaskReveal({
     return <span className={`block ${className ?? ""}`}>{children}</span>;
   }
 
+  /*
+   * The viewport trigger sits on the OUTER mask, with the inner span driven by
+   * variants — it cannot go on the inner span itself.
+   *
+   * IntersectionObserver clips an element's intersection rect against its
+   * ancestors' overflow. The inner span starts translated fully below the
+   * mask's overflow-hidden box, so its visible area is exactly zero and it
+   * never reaches the threshold: it cannot animate until it is on screen, and
+   * it cannot be on screen until it animates. The headline in the CTA banner
+   * sat invisible at its start position because of this.
+   *
+   * The mask itself is never clipped, so it observes normally. <TextReveal>
+   * already worked for the same reason — its trigger is on the heading element,
+   * not on the masked words.
+   */
   return (
-    <span
+    <motion.span
       className={`block overflow-hidden pb-[0.14em] mb-[-0.14em] ${className ?? ""}`}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount }}
     >
       <motion.span
         className="block"
-        initial={{ y: "115%" }}
-        whileInView={{ y: "0%" }}
-        viewport={{ once: true, amount }}
-        transition={{ duration, delay, ease: EASE }}
+        variants={{
+          hidden: { y: "115%" },
+          visible: { y: "0%", transition: { duration, delay, ease: EASE } },
+        }}
       >
         {children}
       </motion.span>
-    </span>
+    </motion.span>
   );
 }

@@ -117,7 +117,7 @@ const mixHex = (from: string, to: string, t: number) => {
  */
 const COMPACT_TYPE_SCALE = 1.7;
 
-export function GrowthChart() {
+export function GrowthChart({ className = "" }: { className?: string } = {}) {
   /*
    * Matches Tailwind's sm breakpoint. Below it the card is narrow enough that
    * the labels need the boost; at sm and up the measured Figma sizes stand.
@@ -263,7 +263,13 @@ export function GrowthChart() {
     <motion.svg
       ref={rootRef}
       viewBox="0 0 932 596"
-      className="h-auto w-full"
+      /*
+       * h-auto w-full by default. A caller can add a max-height — the viewBox
+       * is 1.56:1, so across a full-bleed band the natural height runs past the
+       * viewport. preserveAspectRatio then centres the drawing inside the wider
+       * box rather than distorting it.
+       */
+      className={`h-auto w-full ${className}`}
       role="img"
       aria-label="Chart showing business growth accelerating over time with Midnight Surface"
       initial={reduce ? false : { opacity: 0, scale: 0.97, y: 16 }}

@@ -9,6 +9,25 @@ import { useReducedMotion } from "motion/react";
 gsap.registerPlugin(ScrollTrigger);
 
 /*
+ * Clearance for the sticky nav when jumping to an anchor. Kept in step with the
+ * `scroll-mt-24` on the anchored sections, which is the no-Lenis fallback.
+ */
+const HEADER_OFFSET = 96;
+
+/** Seconds for an anchor jump, regardless of distance. */
+const ANCHOR_DURATION = 1.1;
+
+/*
+ * The live instance, held at module scope rather than only in the effect's
+ * closure. The effect re-runs when the reduced-motion query resolves, and in
+ * dev React mounts effects twice — so a handler that closed over `lenis`
+ * directly could end up holding one that had already been destroyed, whose
+ * scrollTo silently does nothing. Reading it from here means the handler always
+ * talks to the instance that is actually running.
+ */
+let activeLenis: Lenis | null = null;
+
+/*
  * Global smooth scroll.
  *
  * Lenis intercepts wheel/touch input and eases the real window scroll position
@@ -52,9 +71,11 @@ export function SmoothScroll() {
       smoothWheel: true,
       syncTouch: false,
       autoRaf: false,
-      // Lets Lenis ease in-page hash links instead of the browser jumping.
-      anchors: true,
+      // In-page anchors are handled by the delegated listener below instead.
+      anchors: false,
     });
+
+    activeLenis = lenis;
 
     lenis.on("scroll", ScrollTrigger.update);
 
@@ -66,14 +87,90 @@ export function SmoothScroll() {
     gsap.ticker.add(raf);
     gsap.ticker.lagSmoothing(0);
 
+    /*
+     * In-page anchors, eased through Lenis.
+     *
+     * Lenis' own `anchors` option did not intercept these — the browser kept
+     * doing its native instant jump — so the click is handled here instead.
+     * One delegated listener rather than a handler per link, so any future
+     * hash link anywhere on the page gets the behaviour for free.
+     *
+     * HEADER_OFFSET is what stops an anchored section's heading landing
+     * underneath the sticky nav pill. Sections also carry `scroll-mt-24` (the
+     * same 96px) so the native jump lands in the right place when Lenis is not
+     * running at all — reduced motion, or no JS.
+     */
+    const onAnchorClick = (event: MouseEvent) => {
+      // Leave modified clicks alone; they are "open elsewhere", not "navigate".
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      ) {
+        return;
+      }
+
+      const anchor = (event.target as Element | null)?.closest?.<HTMLAnchorElement>(
+        'a[href^="#"]',
+      );
+      const href = anchor?.getAttribute("href");
+      if (!href || href === "#") return;
+
+      const target = document.querySelector(href);
+      if (!target) return;
+
+      event.preventDefault();
+
+      /*
+       * Resolved to a number here rather than handing Lenis the element, and
+       * given an explicit duration, so neither the distance nor the timing is
+       * left to Lenis' own defaults.
+       */
+      const topOf = () =>
+        target.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
+
+      if (!activeLenis) {
+        window.scrollTo({ top: topOf(), behavior: "smooth" });
+      } else {
+        activeLenis.scrollTo(topOf(), {
+          duration: ANCHOR_DURATION,
+          /*
+           * The two pinned sections resize the document as ScrollTrigger
+           * engages and releases their spacers, so a position measured at click
+           * time can be several hundred px stale by the time the scroll lands.
+           * Re-measure once on arrival and close the gap.
+           *
+           * Deliberately a single correction with no onComplete of its own —
+           * a self-rescheduling one could chase a moving layout forever.
+           */
+          onComplete: () => {
+            const drift = target.getBoundingClientRect().top - HEADER_OFFSET;
+            if (Math.abs(drift) > 2) {
+              activeLenis?.scrollTo(topOf(), { duration: 0.35 });
+            }
+          },
+        });
+      }
+
+      // Keep the URL shareable without letting the browser scroll again.
+      window.history.pushState(null, "", href);
+    };
+
+    document.addEventListener("click", onAnchorClick);
+
     // Lenis sets height:auto on html/body, which can change document height.
     // Any trigger measured before that is measuring the old page.
     ScrollTrigger.refresh();
 
     return () => {
+      document.removeEventListener("click", onAnchorClick);
       gsap.ticker.remove(raf);
       gsap.ticker.lagSmoothing(500, 33); // GSAP's default.
       lenis.destroy();
+      if (activeLenis === lenis) activeLenis = null;
     };
   }, [reduce]);
 

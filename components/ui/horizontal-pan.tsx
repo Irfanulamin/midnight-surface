@@ -34,11 +34,18 @@ export function HorizontalPan({
   children,
   className,
   gapClassName = "gap-10",
+  /**
+   * Trailing room after the last card. Raise it when something needs to react
+   * to reaching the middle of the screen: at the default the track stops with
+   * the last card near the right edge, so it never crosses the centre.
+   */
+  trailClassName = "md:pr-[12vw]",
 }: {
   header?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
   gapClassName?: string;
+  trailClassName?: string;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -108,7 +115,12 @@ export function HorizontalPan({
         left (flex-1 + min-h-0), which lets a card size its image to the space
         actually available instead of overflowing its own caption off screen.
       */}
-      <div className="flex flex-col py-16 md:h-[100dvh] md:py-14">
+      {/*
+        py is kept tight at md on purpose: the section is exactly one viewport,
+        so every px of padding here is a px the cards do not get. At py-14 the
+        cards came out 336px tall and their content overflowed.
+      */}
+      <div className="flex flex-col py-16 md:h-[100dvh] md:py-10">
         {header}
         {/*
           On desktop the track starts one full viewport to the right, so every
@@ -120,7 +132,7 @@ export function HorizontalPan({
         */}
         <div
           ref={trackRef}
-          className={`mt-10 flex flex-col px-6 md:mt-10 md:w-max md:min-h-0 md:flex-1 md:flex-row md:px-0 md:pl-[88vw] md:pr-[12vw] ${gapClassName}`}
+          className={`mt-10 flex flex-col px-6 md:mt-6 md:w-max md:min-h-0 md:flex-1 md:flex-row md:px-0 md:pl-[88vw] ${trailClassName} ${gapClassName}`}
         >
           {children}
         </div>
