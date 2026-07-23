@@ -40,7 +40,7 @@ export function CtaBanner() {
           width={4512}
           height={1648}
           className="opacity-25
-           pointer-events-none absolute inset-0 h-full w-full object-cover bg-[linear-gradient(0deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.30)_100%)]"
+           pointer-events-none absolute inset-0 h-full w-full object-cover bg-[linear-gradient(0deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0.15)_100%)]"
         />
         
 
