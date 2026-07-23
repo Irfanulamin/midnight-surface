@@ -83,7 +83,7 @@ export function PricingGrid({ plans }: { plans: Plan[] }) {
   return (
     <motion.div
       ref={ref}
-      className="mt-10 grid gap-5 sm:mt-14 sm:gap-6 md:grid-cols-2"
+      className="mt-10 grid grid-cols-1 gap-5 sm:mt-14 sm:gap-6 md:grid-cols-2"
       /*
        * No staggerChildren: the two cards are a mirrored pair and start on the
        * same frame, so the convergence reads as one gesture. Staggering them

@@ -57,7 +57,7 @@ export function WhyUs() {
             text clipped against each card's overflow-hidden. 900px gives the
             enlarged type the room it needs without collapsing the 2/3/2 split.
           */
-          className="mt-10 grid gap-4 sm:mt-14 sm:gap-5 md:mt-16 md:h-[900px] md:grid-cols-3"
+          className="mt-10 grid grid-cols-1 gap-4 sm:mt-14 sm:gap-5 md:mt-16 md:h-[900px] md:grid-cols-3"
         >
           {/* â”€â”€ Column 1 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
           <RevealItem className="flex flex-col gap-4 sm:gap-5">
