@@ -14,12 +14,12 @@ import { Reveal } from "@/components/ui/reveal";
  */
 const testimonials: Testimonial[] = [
   {
-    name: "Kazi Mirajul Islam",
+    name: "Johnson Smith",
     role: "Founder, Loomcraft Studio",
     rating: "10/10",
     quote:
       "They showed me a homepage before I paid a cent, and it already beat the site I had been putting off for two years. We were live the week after.",
-    image: "/design/testimonial-kazi.png",
+    image: "/design/testimonial-johnson-smith.png",
     width: 287,
     height: 405,
   },
