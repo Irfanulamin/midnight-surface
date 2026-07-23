@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 
+import { Analytics } from "@/components/analytics";
+import { CampaignTracker } from "@/components/campaign-tracker";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { SmoothScroll } from "@/components/ui/smooth-scroll";
 import {
@@ -139,6 +141,13 @@ export default function RootLayout({
         <SmoothScroll />
         <ScrollProgress />
         {children}
+        {/*
+          SEM measurement, free tier only (GA4 + utm attribution). Both are
+          env-gated and inert until NEXT_PUBLIC_GA_ID is set; CampaignTracker
+          also captures utm/click ids and forwards them onto the CTA links.
+        */}
+        <Analytics />
+        <CampaignTracker />
       </body>
     </html>
   );
