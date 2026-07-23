@@ -114,7 +114,7 @@ export function Testimonials() {
             direction="right"
             distance={90}
             duration={1.6}
-            delay={0.55}
+            delay={0.75}
             amount={0.1}
             className="w-[46.7%]"
           >
@@ -130,7 +130,7 @@ export function Testimonials() {
             direction="right"
             distance={90}
             duration={1.6}
-            delay={0.75}
+            delay={1.25}
             amount={0.1}
             className="w-[46.7%]"
           >

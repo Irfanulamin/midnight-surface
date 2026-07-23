@@ -3,6 +3,7 @@ import { CaretDown, CaretUp } from "@phosphor-icons/react/ssr";
 import { SectionIntro } from "@/components/section-intro";
 import { Accordion, AccordionItem } from "@/components/ui/accordion";
 import { Reveal } from "@/components/ui/reveal";
+import { faqSchema } from "@/lib/site";
 
 /*
  * Real answers, written to the studio's actual policies: the free draft, $0
@@ -40,6 +41,15 @@ const faqs = [
 export function Faq() {
   return (
     <section className="px-6 py-16 sm:py-20 md:py-28">
+      {/*
+        FAQPage schema, built from the same `faqs` array rendered below, so the
+        questions can earn an FAQ rich result. Colocated here — not in layout —
+        so the structured data and the visible answers can never fall out of sync.
+      */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(faqs)) }}
+      />
       <div className="mx-auto max-w-[1160px]">
         <SectionIntro
           label="Common Questions"

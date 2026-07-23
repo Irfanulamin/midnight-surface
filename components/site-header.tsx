@@ -2,17 +2,18 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { List, X } from "@phosphor-icons/react/ssr";
-import {
-  AnimatePresence,
-  motion,
-  useMotionValueEvent,
-  useScroll,
-} from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { List } from "@phosphor-icons/react/ssr";
+import { motion, useMotionValueEvent, useScroll } from "motion/react";
+import { useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { EASE } from "@/components/ui/motion";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 /*
  * In-page anchors, not routes — this is a one-page site and those routes do not
@@ -73,17 +74,6 @@ export function SiteHeader() {
     if (next) setMenuOpen(false);
   });
 
-  // The panel overlays the page rather than trapping focus, so Escape is the
-  // expected way out and costs one listener.
-  useEffect(() => {
-    if (!menuOpen) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setMenuOpen(false);
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [menuOpen]);
-
   return (
     <header className="sticky top-4 z-50 px-4 sm:top-6 sm:px-6">
       <motion.nav
@@ -142,72 +132,48 @@ export function SiteHeader() {
             <Link href="/contact">Get Started</Link>
           </Button>
 
-          <button
-            type="button"
-            onClick={() => setMenuOpen((prev) => !prev)}
-            aria-expanded={menuOpen}
-            aria-controls="mobile-nav"
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            className="grid size-10 shrink-0 cursor-pointer place-items-center rounded-pill text-ink transition-colors duration-300 hover:bg-ink/5 lg:hidden"
-          >
-            {/*
-              Both glyphs render and cross-fade, matching how the service rows
-              and FAQ carets swap — one rotating glyph would read as a different
-              gesture from the rest of the page.
-            */}
-            <span className="relative block size-6">
-              <List
-                size={24}
-                aria-hidden
-                className={`absolute inset-0 transition-opacity duration-200 ${
-                  menuOpen ? "opacity-0" : "opacity-100"
-                }`}
-              />
-              <X
-                size={24}
-                aria-hidden
-                className={`absolute inset-0 transition-opacity duration-200 ${
-                  menuOpen ? "opacity-100" : "opacity-0"
-                }`}
-              />
-            </span>
-          </button>
+          {/*
+            Mobile nav is the shadcn Sheet (radix Dialog). Controlled rather than
+            trigger-only so the direction-aware scroll logic above can close it
+            (`setMenuOpen(false)`) when the bar slides away — a menu left open
+            over a hidden bar would be orphaned on screen. Radix owns focus trap,
+            Escape and scroll-lock, which is why the old manual handlers are gone.
+          */}
+          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+            <SheetTrigger
+              aria-label="Open menu"
+              className="grid size-10 shrink-0 cursor-pointer place-items-center rounded-pill text-ink transition-colors duration-300 hover:bg-ink/5 focus:outline-none lg:hidden"
+            >
+              <List size={24} aria-hidden />
+            </SheetTrigger>
+
+            <SheetContent side="right" className="w-4/5 max-w-xs gap-0 pt-16">
+              <SheetTitle className="sr-only">Menu</SheetTitle>
+              <nav aria-label="Mobile">
+                <ul className="flex flex-col gap-1">
+                  {navLinks.map((link) => (
+                    <li key={link.href}>
+                      <a
+                        href={link.href}
+                        onClick={() => setMenuOpen(false)}
+                        className="block rounded-xl px-4 py-3.5 text-[17px] text-ink/85 transition-colors duration-200 hover:bg-cream hover:text-ink"
+                      >
+                        {link.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+
+              <Button asChild size="block" className="mt-6 font-semibold">
+                <Link href="/contact" onClick={() => setMenuOpen(false)}>
+                  Get Started
+                </Link>
+              </Button>
+            </SheetContent>
+          </Sheet>
         </div>
       </motion.nav>
-
-      {/*
-       * Unmounted when closed rather than hidden, so its links stay out of the
-       * tab order without needing inert. There is no measured height here — it
-       * animates opacity and transform only — so this avoids the class of
-       * AnimatePresence bug the accordion ran into.
-       */}
-      <AnimatePresence>
-        {menuOpen ? (
-          <motion.div
-            id="mobile-nav"
-            key="mobile-nav"
-            initial={{ opacity: 0, y: -14 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -14 }}
-            transition={{ duration: 0.3, ease: EASE }}
-            className="mx-auto mt-2 w-full max-w-[1160px] rounded-card bg-white p-2 shadow-[0_1px_2px_rgb(0_0_0/0.04),0_24px_50px_-24px_rgb(0_0_0/0.3)] lg:hidden"
-          >
-            <ul>
-              {navLinks.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    onClick={() => setMenuOpen(false)}
-                    className="block rounded-xl px-4 py-3.5 text-[16px] text-ink/85 transition-colors duration-200 hover:bg-cream hover:text-ink"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
     </header>
   );
 }

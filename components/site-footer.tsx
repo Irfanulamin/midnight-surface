@@ -1,11 +1,7 @@
 import Image from "next/image";
-import {
-  ArrowUpRight,
-  TelegramLogo,
-  WhatsappLogo,
-} from "@phosphor-icons/react/ssr";
 
 import { Reveal } from "@/components/ui/reveal";
+import { ArrowUpRightIcon, WhatsappLogoIcon, TelegramLogoIcon } from "@phosphor-icons/react/ssr";
 
 /*
  * Footer, from the bottom of Frame 1 (node 221:8193 + content 243:8287).
@@ -40,8 +36,8 @@ const footerLinks = [
 ];
 
 const socials = [
-  { label: "WhatsApp", href: "#", Icon: WhatsappLogo },
-  { label: "Telegram", href: "#", Icon: TelegramLogo },
+  { label: "WhatsApp", href: "#", Icon: WhatsappLogoIcon },
+  { label: "Telegram", href: "#", Icon: TelegramLogoIcon },
 ];
 
 export function SiteFooter() {
@@ -86,8 +82,8 @@ export function SiteFooter() {
         */}
         <Reveal
           direction="up"
-          distance={34}
-          duration={2.4}
+          distance={50}
+          duration={3}
           delay={0.35}
           amount={0.1}
           className="pointer-events-none absolute inset-x-0 bottom-0"
@@ -135,7 +131,7 @@ export function SiteFooter() {
               <span className="min-w-0 text-[clamp(22px,5vw,64px)] leading-[1.1] tracking-[-0.02em] transition-colors duration-300 [overflow-wrap:anywhere] group-hover:text-yellow">
                 hello@midnightsurface.com
               </span>
-              <ArrowUpRight
+              <ArrowUpRightIcon
                 size={32}
                 aria-hidden
                 className="mt-1 size-5 shrink-0 text-coral transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 sm:size-7 md:mt-2"
@@ -186,7 +182,7 @@ export function SiteFooter() {
               </div>
 
               <p className="w-full self-end text-[13px] tracking-[-0.02em] text-surface/80 sm:ml-auto sm:w-auto sm:text-[14px]">
-                &copy; 2026 Midnight Surface. All rights reserved.
+                &copy; {new Date().getFullYear()} Midnight Surface. All rights reserved.
               </p>
             </div>
           </div>

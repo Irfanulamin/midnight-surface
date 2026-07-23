@@ -36,14 +36,14 @@ export function TrustedBy() {
             key={client.src}
             /* No hover treatment — these are client marks scrolling past, not
                things to interact with. */
-            className="grid h-[168px] w-[170px] shrink-0 place-items-center rounded-2xl bg-cream p-8 sm:h-[200px] sm:w-[200px] sm:p-12"
+            className="grid shrink-0 place-items-center rounded-2xl bg-cream px-[82px] py-[85px]"
           >
             <Image
               src={client.src}
               alt={client.alt}
               width={608}
               height={3220}
-              className="h-auto max-h-full w-auto max-w-full object-contain"
+              className="size-20 object-contain"
             />
           </div>
         ))}

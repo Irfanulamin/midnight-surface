@@ -221,6 +221,123 @@ html.lenis body {
   }
 }
 
+/*
+ * Mobile-nav Sheet (shadcn Sheet on radix Dialog).
+ *
+ * Radix detects the exit animation off `animationend`, so enter/exit have to be
+ * real @keyframes — a plain transition would let the panel unmount before it
+ * animated out. All four sides are defined so the primitive stays a genuine,
+ * reusable Sheet even though the nav only opens from the right. Under reduced
+ * motion the panel still mounts/unmounts, just without the slide.
+ */
+@keyframes sheet-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes sheet-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes sheet-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes sheet-out-right {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes sheet-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes sheet-out-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+@keyframes sheet-in-top {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes sheet-out-top {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+@keyframes sheet-in-bottom {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes sheet-out-bottom {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-slot="sheet-overlay"],
+  [data-slot="sheet-content"] {
+    animation: none !important;
+  }
+}
+
+/*
+ * Kill the scroll-lock layout shift.
+ *
+ * Radix Dialog (the Sheet) locks scroll via react-remove-scroll, which adds
+ * `margin-right: <scrollbar>px` to <body> to fill the space where it removed the
+ * scrollbar. But the scrollbar here lives on <html> — Lenis is the scroll
+ * container — so nothing is actually removed, and that compensating margin only
+ * shoves the centred hero sideways the instant the Sheet opens. There is no gap
+ * to fill, so cancel it (and the CSS var it derives from).
+ *
+ * `html body[...]` (not plain `body[...]`) is deliberate: react-remove-scroll
+ * injects its rule as a runtime <style> singleton that lands after this file in
+ * <head>, so at equal specificity its `!important` would win on source order.
+ * The extra element bumps specificity so this override wins regardless.
+ */
+html body[data-scroll-locked] {
+  margin-right: 0 !important;
+  --removed-body-scroll-bar-size: 0px;
+}
+
 /* Dot grid that sits behind the hero. */
 .bg-dotgrid {
   background-image: radial-gradient(

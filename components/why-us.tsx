@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { CaretDoubleRight, Sun } from "@phosphor-icons/react/ssr";
 
 import { SectionIntro } from "@/components/section-intro";
 import { RevealGroup, RevealItem } from "@/components/ui/reveal";
@@ -37,7 +36,7 @@ export function WhyUs() {
           Cascades column by column, left to right.
 
           The stagger is at column level, not card level: the columns are flex
-          containers whose children divide a fixed 760px between them, and
+          containers whose children divide a fixed height between them, and
           wrapping each card in its own animated element would put a div between
           the column and the `flex-1` that does the dividing.
         */}
@@ -51,8 +50,14 @@ export function WhyUs() {
             illustration is absolutely positioned would collapse to just their
             heading and the artwork would spill out, which is why those carry an
             explicit min-height that is dropped again at md.
+
+            The pinned height was 760px when the card headings were the Figma's
+            ~21px. They now run at 32px, which is ~1.5x taller per line — at
+            760px the flex cells were shorter than the wrapped headings and the
+            text clipped against each card's overflow-hidden. 900px gives the
+            enlarged type the room it needs without collapsing the 2/3/2 split.
           */
-          className="mt-10 grid gap-4 sm:mt-14 sm:gap-5 md:mt-16 md:h-[760px] md:grid-cols-3"
+          className="mt-10 grid gap-4 sm:mt-14 sm:gap-5 md:mt-16 md:h-[900px] md:grid-cols-3"
         >
           {/* â”€â”€ Column 1 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
           <RevealItem className="flex flex-col gap-4 sm:gap-5">
@@ -88,7 +93,7 @@ export function WhyUs() {
                     span. nowrap keeps the phrase on one line so the strip has
                     a single line box to span.
                   */}
-                  <h3 className="text-[24px] font-semibold leading-[1.1] text-teal-deep sm:text-[28px]">
+                  <h3 className="text-[32px] font-semibold leading-[1.1] text-teal-deep">
                     We Made Custom Design{" "}
                     <span className="relative whitespace-nowrap">
                       <span
@@ -103,7 +108,7 @@ export function WhyUs() {
             </article>
 
             <article className="flex min-h-[120px] flex-1 items-end rounded-2xl bg-cream p-6 sm:p-7 md:min-h-0">
-              <h3 className="text-[19px] font-semibold text-teal-deep sm:text-[21px]">
+              <h3 className="text-[32px] font-semibold text-teal-deep">
                 One Stop Solution
               </h3>
             </article>
@@ -113,12 +118,15 @@ export function WhyUs() {
           <RevealItem className="flex flex-col gap-4 sm:gap-5">
             {/* 4x export of node 135:8153 (364x242). */}
             <article className="relative min-h-[260px] flex-1 overflow-hidden rounded-2xl bg-cream md:min-h-0">
-              <h3 className="relative z-10 flex items-start gap-2 p-6 text-[19px] font-semibold leading-snug text-teal-deep sm:p-7 sm:text-[21px]">
-                <Sun
-                  size={28}
-                  weight="fill"
-                  aria-hidden
-                  className="shrink-0 text-yellow"
+              <h3 className="relative z-10 flex items-start gap-2 p-6 text-[32px] font-semibold leading-snug text-teal-deep sm:p-7">
+                {/* Yellow sun-burst mark exported from the Figma bento (was the
+                    Phosphor Sun icon). Already brand-yellow, so no colour class. */}
+                <Image
+                  src="/design/circle.png"
+                  alt=""
+                  width={192}
+                  height={192}
+                  className="mt-0.5 size-8 shrink-0"
                 />
                 <span>
                   Clear
@@ -136,12 +144,12 @@ export function WhyUs() {
             </article>
 
             <article className="flex min-h-[120px] flex-1 rounded-2xl bg-cream p-6 sm:p-7 md:min-h-0">
-              <h3 className="max-w-[220px] text-[19px] font-semibold leading-snug text-teal-deep sm:text-[21px]">
+              <h3 className="max-w-[220px] text-[32px] font-semibold leading-snug text-teal-deep">
                 Responsive For All Devices
               </h3>
             </article>
 
-            <article className="relative min-h-[280px] flex-1 overflow-hidden rounded-2xl bg-cream md:min-h-0">
+            <article className="relative min-h-[360px] flex-1 overflow-hidden rounded-2xl bg-cream md:min-h-[240px]">
               {/*
                 "Finish" sits on a solid coral bar that starts where the text
                 starts and runs clean off the card's right edge — in the Figma
@@ -149,7 +157,7 @@ export function WhyUs() {
                 span with only a left margin reproduces that: it fills the
                 remaining width to the edge, no right padding to stop short.
               */}
-              <h3 className="relative z-10 pt-6 text-[19px] font-semibold leading-snug text-teal-deep sm:pt-7 sm:text-[21px]">
+              <h3 className="relative z-10 pt-6 text-[32px] font-semibold leading-snug text-teal-deep sm:pt-7">
                 <span className="block px-6 sm:px-7">Support After</span>
                 <span className="mt-1.5 ml-6 block bg-coral py-0.5 text-white sm:ml-7">
                   Finish
@@ -196,12 +204,15 @@ export function WhyUs() {
           {/* â”€â”€ Column 3 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
           <RevealItem className="flex flex-col gap-4 sm:gap-5">
             <article className="flex min-h-[340px] flex-1 flex-col overflow-hidden rounded-2xl bg-cream p-5 md:min-h-0">
-              <h3 className="flex items-center gap-2 px-2 pt-2 text-[19px] font-semibold text-teal-deep sm:text-[21px]">
-                <CaretDoubleRight
-                  size={22}
-                  weight="fill"
-                  aria-hidden
-                  className="shrink-0 text-yellow"
+              <h3 className="flex items-center gap-2 px-2 pt-2 text-[32px] font-semibold text-teal-deep">
+                {/* Yellow chevron exported from the Figma bento (was the
+                    Phosphor CaretDoubleRight icon). */}
+                <Image
+                  src="/design/arrow.png"
+                  alt=""
+                  width={80}
+                  height={92}
+                  className="h-7 w-auto shrink-0"
                 />
                 First Delivery
               </h3>
@@ -220,7 +231,7 @@ export function WhyUs() {
               <div className="rounded-xl bg-teal-deep px-5 py-4 sm:px-6 sm:py-5">
                 {/* The yellow spans all of "Week Not Months" in the Figma,
                     not just "Week". */}
-                <p className="text-[19px] font-semibold leading-snug text-white sm:text-[21px]">
+                <p className="text-[32px] font-semibold leading-snug text-white">
                   Launch In A{" "}
                   <span className="text-yellow">Week Not Months</span>
                 </p>
@@ -228,7 +239,7 @@ export function WhyUs() {
             </article>
 
             <article className="flex min-h-[120px] flex-1 items-end rounded-2xl bg-cream p-6 sm:p-7 md:min-h-0">
-              <h3 className="text-[19px] font-semibold text-teal-deep sm:text-[21px]">
+              <h3 className="text-[32px] font-semibold text-teal-deep">
                 Start With 0.00$
               </h3>
             </article>

@@ -1,8 +1,17 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { SmoothScroll } from "@/components/ui/smooth-scroll";
+import {
+  SITE_DESCRIPTION,
+  SITE_KEYWORDS,
+  SITE_NAME,
+  SITE_TAGLINE,
+  SITE_URL,
+  organizationSchema,
+  websiteSchema,
+} from "@/lib/site";
 import "./globals.css";
 
 /*
@@ -30,10 +39,68 @@ const interDisplay = localFont({
   display: "swap",
 });
 
+/*
+ * Site-wide metadata. `metadataBase` makes every relative URL below (Open
+ * Graph, canonical, the file-convention opengraph-image) resolve to an absolute
+ * one — required for OG tags to validate on social platforms. The title
+ * template lets inner routes set only their own name and inherit the brand
+ * suffix; the single-page site uses `default` for now.
+ */
 export const metadata: Metadata = {
-  title: "Midnight Surface",
-  description:
-    "Professional websites for small businesses—designed, developed, launched, and supported without breaking your bank.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  keywords: SITE_KEYWORDS,
+  applicationName: SITE_NAME,
+  authors: [{ name: SITE_NAME, url: SITE_URL }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  category: "technology",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    description: SITE_DESCRIPTION,
+    // Resolved from the app/opengraph-image file convention.
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    description: SITE_DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/logo.png",
+  },
+};
+
+/*
+ * `themeColor` matches the surface the browser chrome sits against (the cream
+ * page background), so the address bar blends in on mobile. Split out of
+ * `metadata` because Next 16 wants viewport fields in their own export.
+ */
+export const viewport: Viewport = {
+  themeColor: "#fbf9f5",
+  colorScheme: "light",
 };
 
 export default function RootLayout({
@@ -47,6 +114,24 @@ export default function RootLayout({
       className={`${interDisplay.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        {/*
+          Organisation + WebSite structured data, site-wide. Rendered as raw
+          JSON-LD script tags (the standard delivery for schema.org) so search
+          engines can build a rich result for the studio and its pricing. The
+          FAQPage node lives with the FAQ itself, next to the questions.
+        */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationSchema()),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(websiteSchema()),
+          }}
+        />
         {/*
           Mounted above the page so Lenis is running before any ScrollTrigger
           in the tree below measures the document.

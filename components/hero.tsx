@@ -80,7 +80,7 @@ export function Hero() {
         max-h-full caps the chart to that rather than to its own 1.56:1 aspect,
         which is what keeps banner and chart inside one screen.
       */}
-      <div className="mx-auto mt-6 flex min-h-0 w-full max-w-[1060px] flex-1 items-center justify-center rounded-card bg-white p-3 shadow-[0_1px_2px_rgb(0_0_0/0.04),0_32px_80px_-40px_rgb(0_0_0/0.22)] sm:mt-8 sm:p-4 md:p-6">
+      <div className="mx-auto mt-6 flex min-h-0 w-full max-w-[960px] flex-1 items-center justify-center rounded-card bg-white p-3 sm:mt-8 sm:p-4 md:p-6">
         {/* Fits at any width — the chart grows its own type below sm. */}
         <GrowthChart className="max-h-full" />
       </div>

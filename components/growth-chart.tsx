@@ -229,12 +229,9 @@ export function GrowthChart({ className = "" }: { className?: string } = {}) {
     heatRef.current += (velocity - heatRef.current) * 0.14;
     const heat = Math.min(heatRef.current * 110, 1);
 
+    // Heat now only drives the dot's radius; the drop-shadow glow was removed
+    // so the marker stays a flat disc, in keeping with the page's no-shadow rule.
     dot.setAttribute("r", String(9 + heat * 2.5));
-    // Glow only, no ring — layered shadows read as light, not as a border.
-    marker.style.filter =
-      `drop-shadow(0 0 ${7 + heat * 9}px ${colour})` +
-      ` drop-shadow(0 0 ${20 + heat * 24}px ${colour})` +
-      ` drop-shadow(0 0 ${46 + heat * 54}px ${colour})`;
   });
 
   useEffect(() => {
